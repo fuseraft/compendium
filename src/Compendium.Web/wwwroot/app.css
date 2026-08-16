@@ -14,9 +14,17 @@
 }
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background-color: var(--fr-bg);
     color: var(--fr-text);
+}
+
+code, kbd, samp, pre {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+.form-control, .form-select {
+    font-family: 'Roboto', sans-serif;
 }
 
 a, .btn-link {
