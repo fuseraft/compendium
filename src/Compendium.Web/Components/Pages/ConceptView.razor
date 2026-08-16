@@ -1,4 +1,5 @@
 @page "/concept/{*ConceptId}"
+@rendermode InteractiveServer
 @using Compendium.Okf
 @using Markdig
 @inject Services.BundleService BundleService
@@ -74,6 +75,32 @@
             </div>
         }
 
+        @if (concept.Status.Equals("draft", StringComparison.OrdinalIgnoreCase))
+        {
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">⚠️ Draft Concept - Review Required</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">This concept was created by an agent and needs human review before it can be marked as stable.</p>
+                    <div class="btn-group me-2">
+                        <button class="btn btn-success" @onclick="() => MarkAsStable()" disabled="@isProcessing">
+                            ✓ Approve & Mark Stable
+                        </button>
+                        <button class="btn btn-danger" @onclick="() => DeleteConcept()" disabled="@isProcessing">
+                            ✗ Reject & Delete
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(statusMessage))
+                    {
+                        <div class="alert @(statusSuccess ? "alert-success" : "alert-danger") mt-3 mb-0">
+                            @statusMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
         <div class="mb-4">
             <a href="/" class="btn btn-secondary">Back to Catalog</a>
         </div>
@@ -85,12 +112,97 @@
     public string? ConceptId { get; set; }
 
     private Concept? concept;
+    private bool isProcessing = false;
+    private string? statusMessage = null;
+    private bool statusSuccess = false;
 
     protected override void OnInitialized()
     {
         if (BundleService.CurrentBundle != null && ConceptId != null)
         {
             BundleService.CurrentBundle.Concepts.TryGetValue(ConceptId, out concept);
+        }
+    }
+
+    private void MarkAsStable()
+    {
+        if (concept == null || BundleService.BundlePath == null) return;
+
+        isProcessing = true;
+        statusMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = Compendium.Okf.ConceptWriter.UpdateStatus(
+                BundleService.BundlePath,
+                concept.Id,
+                "stable",
+                "user:web-ui",
+                DateTime.UtcNow);
+
+            statusSuccess = result.Success;
+            statusMessage = result.Message;
+
+            if (result.Success)
+            {
+                BundleService.ReloadBundle();
+                // Reload the concept from the reloaded bundle
+                if (BundleService.CurrentBundle != null && ConceptId != null)
+                {
+                    BundleService.CurrentBundle.Concepts.TryGetValue(ConceptId, out concept);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            statusSuccess = false;
+            statusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void DeleteConcept()
+    {
+        if (concept == null || BundleService.BundlePath == null) return;
+
+        isProcessing = true;
+        statusMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = Compendium.Okf.ConceptWriter.Delete(
+                BundleService.BundlePath,
+                concept.Id,
+                "user:web-ui",
+                DateTime.UtcNow);
+
+            statusSuccess = result.Success;
+            statusMessage = result.Message;
+
+            if (result.Success)
+            {
+                // Redirect to home after successful deletion
+                System.Threading.Tasks.Task.Delay(1500).ContinueWith(_ =>
+                {
+                    Navigation.NavigateTo("/");
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            statusSuccess = false;
+            statusMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
         }
     }
 

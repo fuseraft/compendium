@@ -210,6 +210,84 @@ public static class ConceptWriter
         return new WriteResult(true, $"Flagged '{id}' for review.");
     }
 
+    public static WriteResult UpdateStatus(string bundleRoot, string id, string newStatus, string actor, DateTime atUtc)
+    {
+        var validation = ValidateId(bundleRoot, id, out var path);
+        if (!validation.Success)
+        {
+            return validation;
+        }
+
+        if (!File.Exists(path))
+        {
+            return new WriteResult(false, $"No concept with id '{id}'.");
+        }
+
+        // Validate status
+        var validStatuses = new[] { "draft", "stable", "deprecated" };
+        if (!validStatuses.Contains(newStatus.ToLower()))
+        {
+            return new WriteResult(false, $"Invalid status '{newStatus}'. Must be one of: {string.Join(", ", validStatuses)}.");
+        }
+
+        var rawText = File.ReadAllText(path);
+        var lines = rawText.Split('\n');
+        if (lines.Length == 0 || lines[0].TrimEnd('\r') != "---")
+        {
+            return new WriteResult(false, $"Concept '{id}' is missing a YAML frontmatter block.");
+        }
+
+        var closingLine = -1;
+        for (var i = 1; i < lines.Length; i++)
+        {
+            if (lines[i].TrimEnd('\r') == "---")
+            {
+                closingLine = i;
+                break;
+            }
+        }
+
+        if (closingLine < 0)
+        {
+            return new WriteResult(false, $"Concept '{id}' frontmatter block is not terminated with '---'.");
+        }
+
+        var frontmatterLines = lines[1..closingLine].ToList();
+        ReplaceOrAddLine(frontmatterLines, @"^status:\s*\S+", $"status: {newStatus.ToLower()}");
+
+        // Add verified marker if promoting to stable
+        if (newStatus.ToLower() == "stable")
+        {
+            var verifiedLine = $"verified: {{ by: {actor}, at: {atUtc:yyyy-MM-ddTHH:mm:ssZ} }}";
+            ReplaceOrAddLine(frontmatterLines, @"^verified:\s*\{", verifiedLine);
+        }
+
+        var body = string.Join('\n', lines[(closingLine + 1)..]);
+        var newText = "---\n" + string.Join('\n', frontmatterLines) + "\n---\n" + body;
+        File.WriteAllText(path, newText);
+
+        ConceptLog.Append(bundleRoot, $"**Status Update** — `{id}` status changed to {newStatus} by {actor}.", atUtc);
+        return new WriteResult(true, $"Updated '{id}' status to {newStatus}.");
+    }
+
+    public static WriteResult Delete(string bundleRoot, string id, string actor, DateTime atUtc)
+    {
+        var validation = ValidateId(bundleRoot, id, out var path);
+        if (!validation.Success)
+        {
+            return validation;
+        }
+
+        if (!File.Exists(path))
+        {
+            return new WriteResult(false, $"No concept with id '{id}'.");
+        }
+
+        File.Delete(path);
+        ConceptLog.Append(bundleRoot, $"**Deletion** — `{id}` deleted by {actor}.", atUtc);
+        return new WriteResult(true, $"Deleted '{id}'.");
+    }
+
     private static WriteResult ValidateId(string bundleRoot, string id, out string fullPath)
     {
         fullPath = "";

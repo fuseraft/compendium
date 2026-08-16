@@ -1,0 +1,236 @@
+@page "/review"
+@rendermode InteractiveServer
+@using Compendium.Okf
+@inject Services.BundleService BundleService
+@inject NavigationManager Navigation
+
+<PageTitle>Review Draft Concepts - Compendium</PageTitle>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Catalog</a></li>
+            <li class="breadcrumb-item active">Review Drafts</li>
+        </ol>
+    </nav>
+
+    <h1>Review Draft Concepts</h1>
+    <p class="lead text-muted">Review and approve concepts created by the agent</p>
+
+    @if (BundleService.CurrentBundle == null)
+    {
+        <div class="alert alert-warning">
+            No bundle loaded. <a href="/load-bundle">Load a bundle</a> to review concepts.
+        </div>
+    }
+    else
+    {
+        @if (draftConcepts.Count == 0)
+        {
+            <div class="alert alert-success">
+                <strong>✓ All clear!</strong> No draft concepts awaiting review.
+            </div>
+            <a href="/" class="btn btn-primary">Back to Catalog</a>
+        }
+        else
+        {
+            <div class="alert alert-info mb-4">
+                <strong>@draftConcepts.Count</strong> draft concept@(draftConcepts.Count == 1 ? "" : "s") awaiting review
+            </div>
+
+            @foreach (var concept in draftConcepts)
+            {
+                <div class="card mb-4 @(processedConcepts.Contains(concept.Id) ? "border-success" : "border-warning")">
+                    <div class="card-header @(processedConcepts.Contains(concept.Id) ? "bg-success text-white" : "bg-warning text-dark")">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                @if (processedConcepts.Contains(concept.Id))
+                                {
+                                    <span>✓ </span>
+                                }
+                                @concept.Title
+                            </h5>
+                            <span class="badge bg-secondary">@concept.Type</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-2"><strong>ID:</strong> @concept.Id</p>
+                        <p class="mb-3">@concept.Description</p>
+
+                        @if (concept.Frontmatter.TryGetValue("tags", out var tagsObj) && tagsObj is System.Collections.IEnumerable tags)
+                        {
+                            <div class="mb-3">
+                                @foreach (var tag in tags)
+                                {
+                                    <span class="badge bg-secondary me-1">@tag</span>
+                                }
+                            </div>
+                        }
+
+                        @if (concept.Frontmatter.TryGetValue("generated", out var genObj) && genObj is IDictionary<object, object> genDict)
+                        {
+                            <p class="small text-muted mb-3">
+                                <strong>Generated:</strong>
+                                by @(genDict.TryGetValue("by", out var byValue) ? byValue : "unknown")
+                                at @(genDict.TryGetValue("at", out var atValue) ? atValue : "unknown")
+                            </p>
+                        }
+
+                        <details class="mb-3">
+                            <summary class="btn btn-sm btn-outline-secondary">Preview Content</summary>
+                            <div class="mt-2 p-3 bg-light rounded">
+                                <pre style="white-space: pre-wrap; font-size: 0.85rem;">@concept.Body.Substring(0, Math.Min(500, concept.Body.Length))@(concept.Body.Length > 500 ? "..." : "")</pre>
+                            </div>
+                        </details>
+
+                        @if (!processedConcepts.Contains(concept.Id))
+                        {
+                            <div class="btn-group">
+                                <button class="btn btn-success" @onclick="() => ApproveConcept(concept.Id)" disabled="@isProcessing">
+                                    ✓ Approve & Mark Stable
+                                </button>
+                                <button class="btn btn-outline-secondary" @onclick="() => ViewConcept(concept.Id)" disabled="@isProcessing">
+                                    👁️ View Full Details
+                                </button>
+                                <button class="btn btn-danger" @onclick="() => RejectConcept(concept.Id)" disabled="@isProcessing">
+                                    ✗ Reject & Delete
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-success mb-0 mt-2">
+                                ✓ Approved and marked as stable
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger">
+                    @errorMessage
+                </div>
+            }
+
+            <div class="mt-4">
+                <a href="/" class="btn btn-secondary">Back to Catalog</a>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<Concept> draftConcepts = new();
+    private HashSet<string> processedConcepts = new();
+    private bool isProcessing = false;
+    private string? errorMessage = null;
+
+    protected override void OnInitialized()
+    {
+        LoadDraftConcepts();
+    }
+
+    private void LoadDraftConcepts()
+    {
+        if (BundleService.CurrentBundle == null)
+            return;
+
+        draftConcepts = BundleService.CurrentBundle.Concepts.Values
+            .Where(c => c.Status.Equals("draft", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(c => c.Id)
+            .ToList();
+    }
+
+    private void ApproveConcept(string conceptId)
+    {
+        if (BundleService.BundlePath == null)
+        {
+            errorMessage = "Bundle path is not set";
+            StateHasChanged();
+            return;
+        }
+
+        isProcessing = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = Compendium.Okf.ConceptWriter.UpdateStatus(
+                BundleService.BundlePath,
+                conceptId,
+                "stable",
+                "user:web-ui",
+                DateTime.UtcNow);
+
+            if (result.Success)
+            {
+                processedConcepts.Add(conceptId);
+                BundleService.ReloadBundle();
+                LoadDraftConcepts();
+            }
+            else
+            {
+                errorMessage = $"Failed to approve: {result.Message}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error approving concept: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void RejectConcept(string conceptId)
+    {
+        if (BundleService.BundlePath == null)
+        {
+            errorMessage = "Bundle path is not set";
+            StateHasChanged();
+            return;
+        }
+
+        isProcessing = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = Compendium.Okf.ConceptWriter.Delete(
+                BundleService.BundlePath,
+                conceptId,
+                "user:web-ui",
+                DateTime.UtcNow);
+
+            if (result.Success)
+            {
+                BundleService.ReloadBundle();
+                LoadDraftConcepts();
+            }
+            else
+            {
+                errorMessage = $"Failed to delete: {result.Message}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error deleting concept: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ViewConcept(string conceptId)
+    {
+        Navigation.NavigateTo($"/concept/{conceptId}");
+    }
+}

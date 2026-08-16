@@ -1,19 +1,45 @@
+:root {
+    --fr-bg: #faf8f5;
+    --fr-surface: #ffffff;
+    --fr-surface2: #f1ebe1;
+    --fr-border: #e6ddd0;
+    --fr-text: #1a1a18;
+    --fr-muted: #6b6356;
+    --fr-dimmer: #9c9486;
+    --fr-primary: #c4452e;
+    --fr-primary-light: #e0784f;
+    --fr-primary-dim: rgba(196, 69, 46, 0.08);
+    --fr-on-primary: #fff8f4;
+    --fr-accent: #2a5c4a;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--fr-bg);
+    color: var(--fr-text);
 }
 
 a, .btn-link {
-    color: #006bb7;
+    color: var(--fr-primary);
+}
+
+a:hover, .btn-link:hover {
+    color: var(--fr-primary-light);
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    color: var(--fr-on-primary);
+    background-color: var(--fr-primary);
+    border-color: var(--fr-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--fr-primary-light);
+    border-color: var(--fr-primary-light);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--fr-primary-dim);
 }
 
 .content {
@@ -57,4 +83,138 @@ h1:focus {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
+}
+
+/* Cards */
+.card {
+    background-color: var(--fr-surface);
+    border-color: var(--fr-border);
+}
+
+.card-header {
+    background-color: var(--fr-surface2);
+    border-bottom-color: var(--fr-border);
+    color: var(--fr-text);
+}
+
+/* Badges */
+.badge.bg-primary {
+    background-color: var(--fr-primary) !important;
+    color: var(--fr-on-primary);
+}
+
+.badge.bg-secondary {
+    background-color: var(--fr-surface2) !important;
+    color: var(--fr-muted);
+}
+
+.text-muted {
+    color: var(--fr-muted) !important;
+}
+
+/* Alerts */
+.alert-info {
+    background-color: var(--fr-primary-dim);
+    border-color: var(--fr-border);
+    color: var(--fr-text);
+}
+
+.alert-success {
+    background-color: rgba(42, 92, 74, 0.08);
+    border-color: var(--fr-accent);
+    color: var(--fr-text);
+}
+
+.alert-warning {
+    background-color: rgba(224, 120, 79, 0.12);
+    border-color: var(--fr-primary-light);
+    color: var(--fr-text);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+}
+
+.breadcrumb-item a {
+    color: var(--fr-primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--fr-muted);
+}
+
+/* Forms */
+.form-control, .form-select {
+    background-color: var(--fr-surface);
+    border-color: var(--fr-border);
+    color: var(--fr-text);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--fr-primary);
+}
+
+/* Tables */
+.table {
+    color: var(--fr-text);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--fr-surface2);
+}
+
+/* Buttons */
+.btn-secondary {
+    background-color: var(--fr-surface2);
+    border-color: var(--fr-border);
+    color: var(--fr-text);
+}
+
+.btn-secondary:hover {
+    background-color: var(--fr-border);
+    border-color: var(--fr-border);
+}
+
+.btn-success {
+    background-color: var(--fr-accent);
+    border-color: var(--fr-accent);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: var(--fr-muted);
+    border-color: var(--fr-border);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--fr-surface2);
+    color: var(--fr-text);
+}
+
+/* List Groups */
+.list-group-item {
+    background-color: var(--fr-surface);
+    border-color: var(--fr-border);
+    color: var(--fr-text);
+}
+
+.list-group-item.active {
+    background-color: var(--fr-primary-dim);
+    border-color: var(--fr-primary);
+    color: var(--fr-text);
+}
+
+.list-group-item.active .text-muted {
+    color: var(--fr-muted) !important;
+}
+
+.list-group-item:hover {
+    background-color: var(--fr-surface2);
+    color: var(--fr-text);
+}
+
+.list-group-item-action:focus {
+    background-color: var(--fr-surface2);
+    color: var(--fr-text);
 }
