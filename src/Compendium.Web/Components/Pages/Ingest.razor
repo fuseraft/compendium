@@ -1,0 +1,843 @@
+@page "/ingest"
+@rendermode InteractiveServer
+@using Compendium.Ingest
+@using Compendium.Agent
+@using Markdig
+@inject Services.BundleService BundleService
+@inject Services.IngestionService IngestionService
+@inject Services.LlmConfigService LlmConfigService
+@inject NavigationManager Navigation
+
+<PageTitle>Ingest - Compendium</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Ingest Documents</h1>
+
+    @if (BundleService.CurrentBundle == null)
+    {
+        <div class="alert alert-warning">
+            <h5 class="alert-heading">No Bundle Loaded</h5>
+            <p>You need to load a knowledge bundle before ingesting documents.</p>
+            <hr>
+            <a href="/load-bundle" class="btn btn-primary">Load Bundle</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Upload Documents</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <strong>Error:</strong> @errorMessage
+                            </div>
+                        }
+
+                        @if (ingestionResult != null && string.IsNullOrEmpty(repositoryAnalysis))
+                        {
+                            <div class="alert alert-success" role="alert">
+                                <h6 class="alert-heading">Ingestion Complete!</h6>
+                                <ul class="mb-0">
+                                    <li>Files Processed: <strong>@ingestionResult.FilesProcessed</strong></li>
+                                    <li>Concepts Written: <strong>@ingestionResult.ConceptsWritten</strong></li>
+                                    @if (ingestionResult.SkippedFiles.Count > 0)
+                                    {
+                                        <li>Skipped Files: <strong>@ingestionResult.SkippedFiles.Count</strong> (unsupported format)</li>
+                                    }
+                                    @if (ingestionResult.FailedFiles.Count > 0)
+                                    {
+                                        <li class="text-danger">Failed Files: <strong>@ingestionResult.FailedFiles.Count</strong></li>
+                                    }
+                                </ul>
+                                <hr>
+                                <button class="btn btn-primary" @onclick="ReloadBundle">Reload Bundle to See New Concepts</button>
+                            </div>
+
+                            @if (ingestionResult.FailedFiles.Count > 0)
+                            {
+                                <div class="alert alert-danger">
+                                    <h6>Failed Files:</h6>
+                                    <ul class="small mb-0">
+                                        @foreach (var (file, error) in ingestionResult.FailedFiles)
+                                        {
+                                            <li><code>@Path.GetFileName(file)</code>: @error</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+
+                        @if (!string.IsNullOrEmpty(repositoryAnalysis))
+                        {
+                            <div class="alert alert-success" role="alert">
+                                <h6 class="alert-heading">✓ Repository Integration Complete!</h6>
+                                <div class="markdown-content">
+                                    @((MarkupString)RenderMarkdown(repositoryAnalysis))
+                                </div>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label for="conceptType" class="form-label">Concept Type</label>
+                            <div class="input-group">
+                                <select class="form-select"
+                                        id="conceptType"
+                                        @bind="conceptType"
+                                        disabled="@isProcessing">
+                                    @if (!string.IsNullOrEmpty(customConceptType))
+                                    {
+                                        <option value="@customConceptType">@customConceptType</option>
+                                    }
+                                    @foreach (var type in existingConceptTypes)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                    <option value="__custom__">+ Add New Type...</option>
+                                </select>
+                                @if (showCustomTypeInput)
+                                {
+                                    <input type="text"
+                                           class="form-control"
+                                           @bind="customConceptType"
+                                           @bind:event="oninput"
+                                           @onblur="ApplyCustomType"
+                                           placeholder="Enter new type"
+                                           disabled="@isProcessing" />
+                                }
+                            </div>
+                            <div class="form-text">
+                                The type assigned to ingested concepts. Determines the subdirectory name (pluralized).
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="btn-group w-100 mb-2" role="group">
+                                <input type="radio" class="btn-check" name="ingestMode" id="modeFiles"
+                                       checked="@(ingestMode == "files")"
+                                       @onchange="@(e => ingestMode = "files")"
+                                       disabled="@isProcessing" />
+                                <label class="btn btn-outline-primary" for="modeFiles">Upload Files</label>
+
+                                <input type="radio" class="btn-check" name="ingestMode" id="modeDirectory"
+                                       checked="@(ingestMode == "directory")"
+                                       @onchange="@(e => ingestMode = "directory")"
+                                       disabled="@isProcessing" />
+                                <label class="btn btn-outline-primary" for="modeDirectory">Local Directory</label>
+
+                                <input type="radio" class="btn-check" name="ingestMode" id="modeRepository"
+                                       checked="@(ingestMode == "repository")"
+                                       @onchange="@(e => ingestMode = "repository")"
+                                       disabled="@isProcessing" />
+                                <label class="btn btn-outline-primary" for="modeRepository">Repository Integration</label>
+                            </div>
+
+                            @if (ingestMode == "files")
+                            {
+                                <label for="fileUpload" class="form-label">Select Files</label>
+                                <InputFile id="fileUpload"
+                                          OnChange="HandleFileSelection"
+                                          multiple
+                                          disabled="@isProcessing"
+                                          class="form-control" />
+                                <div class="form-text">
+                                    Select one or more files to ingest. Multiple files can be selected at once.
+                                </div>
+                            }
+                            else if (ingestMode == "directory")
+                            {
+                                <label for="directoryPath" class="form-label">Directory Path</label>
+                                <div class="input-group">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="directoryPath"
+                                           @bind="directoryPath"
+                                           placeholder="e.g., C:\docs\policies or /home/user/documents"
+                                           disabled="@isProcessing" />
+                                    <button class="btn btn-outline-secondary"
+                                            @onclick="() => showDirectoryBrowser = !showDirectoryBrowser"
+                                            disabled="@isProcessing">
+                                        📁 Browse
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Enter the full path to a local directory. All supported files will be ingested recursively.
+                                </div>
+
+                                @if (showDirectoryBrowser)
+                                {
+                                    <div class="mt-2">
+                                        <FolderBrowser OnFolderSelected="HandleDirectorySelected"
+                                                      OnClosed="() => showDirectoryBrowser = false" />
+                                    </div>
+                                }
+                            }
+                            else if (ingestMode == "repository")
+                            {
+                                <label for="repositoryPath" class="form-label">Repository Path</label>
+                                <div class="input-group">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="repositoryPath"
+                                           @bind="repositoryPath"
+                                           placeholder="e.g., C:\code\my-project"
+                                           disabled="@isProcessing" />
+                                    <button class="btn btn-outline-secondary"
+                                            @onclick="() => showRepositoryBrowser = !showRepositoryBrowser"
+                                            disabled="@isProcessing">
+                                        📁 Browse
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Enter the path to a git repository. The agent will analyze it and create relevant concepts.
+                                </div>
+
+                                @if (showRepositoryBrowser)
+                                {
+                                    <div class="mt-2">
+                                        <FolderBrowser OnFolderSelected="HandleRepositorySelected"
+                                                      OnClosed="() => showRepositoryBrowser = false" />
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(repositoryPath) && !isProcessing)
+                                {
+                                    <div class="alert alert-info mt-2">
+                                        <small>
+                                            <strong>AI Integration:</strong> The agent will:
+                                            <ul class="mb-0">
+                                                <li>Analyze repository structure and content</li>
+                                                <li>Cross-reference with existing catalog knowledge</li>
+                                                <li>Generate appropriate concepts (architecture, components, APIs, etc.)</li>
+                                                <li>Ask for your confirmation before creating concepts</li>
+                                            </ul>
+                                        </small>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        @if (ingestMode == "files" && selectedFiles.Count > 0)
+                        {
+                            <div class="mb-3">
+                                <h6>Selected Files (@selectedFiles.Count):</h6>
+                                <ul class="list-group">
+                                    @foreach (var file in selectedFiles)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>
+                                                <code>@file.Name</code>
+                                                <small class="text-muted">(@FormatFileSize(file.Size))</small>
+                                            </span>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    @onclick="() => RemoveFile(file)"
+                                                    disabled="@isProcessing">
+                                                Remove
+                                            </button>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+
+                        @if ((ingestMode == "files" && selectedFiles.Count > 0) ||
+                             (ingestMode == "directory" && !string.IsNullOrWhiteSpace(directoryPath)) ||
+                             (ingestMode == "repository" && !string.IsNullOrWhiteSpace(repositoryPath)))
+                        {
+                            <button class="btn btn-primary"
+                                    @onclick="ProcessIngestion"
+                                    disabled="@GetButtonDisabled()">
+                                @if (isProcessing)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Processing...</span>
+                                }
+                                else if (ingestMode == "files")
+                                {
+                                    <span>Ingest @selectedFiles.Count File(s)</span>
+                                }
+                                else if (ingestMode == "directory")
+                                {
+                                    <span>Ingest Directory</span>
+                                }
+                                else if (ingestMode == "repository")
+                                {
+                                    <span>Analyze &amp; Integrate Repository</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Current Bundle</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="mb-0">
+                            <dt>Path:</dt>
+                            <dd><code class="small">@BundleService.BundlePath</code></dd>
+
+                            <dt>Concepts:</dt>
+                            <dd>@BundleService.CurrentBundle.Concepts.Count</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Supported Formats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <h6 class="small">Documents</h6>
+                                <ul class="small mb-2">
+                                    <li>.txt</li>
+                                    <li>.md</li>
+                                    <li>.pdf</li>
+                                    <li>.docx</li>
+                                </ul>
+
+                                <h6 class="small">Data</h6>
+                                <ul class="small mb-2">
+                                    <li>.json</li>
+                                    <li>.xml</li>
+                                    <li>.csv</li>
+                                    <li>.xlsx</li>
+                                </ul>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small">Email</h6>
+                                <ul class="small mb-2">
+                                    <li>.eml</li>
+                                    <li>.msg</li>
+                                    <li>.ost</li>
+                                </ul>
+
+                                <h6 class="small">Diagrams</h6>
+                                <ul class="small mb-2">
+                                    <li>.drawio</li>
+                                    <li>.vsdx</li>
+                                    <li>.archimate</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string ingestMode = "files";
+    private string conceptType = "Document";
+    private string customConceptType = "";
+    private bool showCustomTypeInput = false;
+    private bool showDirectoryBrowser = false;
+    private bool showRepositoryBrowser = false;
+    private List<string> existingConceptTypes = new();
+    private string directoryPath = "";
+    private string repositoryPath = "";
+    private string? repositoryAnalysis = null;
+    private List<IBrowserFile> selectedFiles = new();
+    private bool isProcessing = false;
+    private int processedCount = 0;
+    private string? errorMessage = null;
+    private IngestionResult? ingestionResult = null;
+
+    protected override void OnInitialized()
+    {
+        LoadExistingTypes();
+    }
+
+    private void LoadExistingTypes()
+    {
+        existingConceptTypes = BundleService.GetConceptTypes();
+        if (existingConceptTypes.Count == 0)
+        {
+            existingConceptTypes = new List<string> { "Document", "System", "Integration", "Process" };
+        }
+        if (!existingConceptTypes.Contains(conceptType))
+        {
+            conceptType = existingConceptTypes.FirstOrDefault() ?? "Document";
+        }
+    }
+
+    private void ApplyCustomType()
+    {
+        if (!string.IsNullOrWhiteSpace(customConceptType))
+        {
+            conceptType = customConceptType;
+            showCustomTypeInput = false;
+        }
+    }
+
+    private void HandleFileSelection(InputFileChangeEventArgs e)
+    {
+        selectedFiles.Clear();
+        foreach (var file in e.GetMultipleFiles(100)) // Max 100 files
+        {
+            selectedFiles.Add(file);
+        }
+        errorMessage = null;
+        ingestionResult = null;
+
+        // Watch for custom type selection
+        if (conceptType == "__custom__")
+        {
+            showCustomTypeInput = true;
+            customConceptType = "";
+        }
+        else
+        {
+            showCustomTypeInput = false;
+        }
+    }
+
+    private void RemoveFile(IBrowserFile file)
+    {
+        selectedFiles.Remove(file);
+    }
+
+    private async Task ProcessIngestion()
+    {
+        if (BundleService.BundlePath == null)
+            return;
+
+        isProcessing = true;
+        processedCount = 0;
+        errorMessage = null;
+        ingestionResult = null;
+        StateHasChanged();
+
+        try
+        {
+            if (ingestMode == "files")
+            {
+                await ProcessFiles();
+            }
+            else if (ingestMode == "directory")
+            {
+                ProcessDirectory();
+            }
+            else if (ingestMode == "repository")
+            {
+                await ProcessRepository();
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Processing failed: {ex.Message}";
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ProcessFiles()
+    {
+        if (selectedFiles.Count == 0 || BundleService.BundlePath == null)
+            return;
+
+        var uploadedPaths = new List<string>();
+
+        try
+        {
+            // Upload files
+            foreach (var file in selectedFiles)
+            {
+                try
+                {
+                    using var stream = file.OpenReadStream(maxAllowedSize: 200 * 1024 * 1024); // 200MB max
+                    var tempPath = await IngestionService.SaveUploadedFileAsync(stream, file.Name);
+                    uploadedPaths.Add(tempPath);
+                    processedCount++;
+                    StateHasChanged();
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = $"Failed to upload {file.Name}: {ex.Message}";
+                    return;
+                }
+            }
+
+            // Run ingestion
+            ingestionResult = IngestionService.IngestFiles(uploadedPaths, BundleService.BundlePath, conceptType);
+        }
+        finally
+        {
+            // Cleanup temp files
+            foreach (var path in uploadedPaths)
+            {
+                IngestionService.CleanupTempFile(path);
+            }
+        }
+    }
+
+    private void ProcessDirectory()
+    {
+        if (string.IsNullOrWhiteSpace(directoryPath) || BundleService.BundlePath == null)
+            return;
+
+        if (!Directory.Exists(directoryPath))
+        {
+            errorMessage = $"Directory not found: {directoryPath}";
+            return;
+        }
+
+        try
+        {
+            ingestionResult = IngestionService.IngestDirectory(directoryPath, BundleService.BundlePath, conceptType);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Directory ingestion failed: {ex.Message}";
+        }
+    }
+
+    private async Task ProcessRepository()
+    {
+        if (string.IsNullOrWhiteSpace(repositoryPath) || BundleService.BundlePath == null)
+            return;
+
+        if (!Directory.Exists(repositoryPath))
+        {
+            errorMessage = $"Repository not found: {repositoryPath}";
+            return;
+        }
+
+        // Check if LLM is configured
+        if (!LlmConfigService.IsConfigured)
+        {
+            errorMessage = "LLM is not configured. Please configure it in Settings before using repository integration.";
+            return;
+        }
+
+        // Check if it's a git repository
+        var gitDir = Path.Combine(repositoryPath, ".git");
+        if (!Directory.Exists(gitDir))
+        {
+            errorMessage = "This directory is not a git repository. Repository integration requires a .git directory.";
+            return;
+        }
+
+        try
+        {
+            // Get git branch information
+            var currentBranch = await GetCurrentGitBranch(repositoryPath);
+
+            // Analyze repository structure
+            var repoInfo = AnalyzeRepositoryStructure(repositoryPath);
+
+            // Use the agent to analyze the repository
+            var prompt = $@"Analyze this git repository and suggest relevant OKF concepts to create for the knowledge catalog.
+
+Repository Path: {repositoryPath}
+Current Branch: {currentBranch}
+Concept Type: {conceptType}
+
+## Repository Structure
+
+{repoInfo.DirectoryStructure}
+
+## Key Files Found
+
+{repoInfo.KeyFilesInfo}
+
+## README Content
+
+{repoInfo.ReadmeContent}
+
+## Technology Stack Detected
+
+{repoInfo.TechnologyStack}
+
+---
+
+## Available Tools
+
+You have access to filesystem tools to read actual code files:
+- ReadFile(path) - Read the contents of any file in the repository
+- ListFiles(path, pattern, recursive) - List files matching a pattern (e.g. '*.sql', '*.cs', '*.java')
+- ReadDirectoryStructure(path, maxDepth) - Get detailed directory tree
+
+## Tasks
+
+1. Use ListFiles and ReadFile to examine key source files (stored procedures, packages, main code files, etc.)
+2. Based on actual code content, identify the purpose and architecture
+3. Cross-reference with the existing catalog ({BundleService.CurrentBundle?.Concepts.Count ?? 0} concepts) using SearchConcepts and ListConcepts to avoid duplicates
+4. Create 3-5 specific OKF concepts that would be valuable additions to the catalog
+
+## How to Create Concepts
+
+You have write access to the knowledge catalog. For each concept you want to create:
+- Use CreateConcept(type, title, description, body, tags) to add it
+- The body should include relevant details from the actual code you read
+- Tag concepts with relevant keywords
+- Link concepts together using AddLink() when appropriate
+
+## Process
+
+1. Explore repository structure with ListFiles and ReadDirectoryStructure
+2. Read key source files with ReadFile to understand actual implementation
+3. Search existing catalog with SearchConcepts to find related concepts
+4. Create new concepts with CreateConcept, grounding each in actual code you read
+5. Link new concepts to existing ones with AddLink where relationships exist
+
+Summarize what you created and why each concept is valuable.";
+
+            var settings = new Compendium.Agent.AgentSettings
+            {
+                BaseUrl = LlmConfigService.BaseUrl!,
+                ApiKey = LlmConfigService.ApiKey!,
+                Model = LlmConfigService.ModelName!
+            };
+
+            var tools = new Compendium.Agent.CompendiumTools(BundleService.CurrentBundle!);
+            var agent = Compendium.Agent.CompendiumAgentFactory.Create(settings, tools, allowWrite: true);
+            var session = await agent.CreateSessionAsync();
+
+            var response = await agent.RunAsync(prompt, session);
+
+            // Reload bundle to pick up any new concepts created by the agent
+            BundleService.ReloadBundle();
+
+            // Show the analysis in the success message
+            errorMessage = null;
+            ingestionResult = new Compendium.Ingest.IngestionResult(
+                FilesProcessed: 1, // Repository analyzed
+                ConceptsWritten: 0, // Agent will report how many it created
+                SkippedFiles: new List<string>(),
+                FailedFiles: new List<(string, string)>()
+            );
+
+            // Store the agent's response for display
+            repositoryAnalysis = response.Text;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Repository analysis failed: {ex.Message}";
+        }
+    }
+
+    private async Task<string> GetCurrentGitBranch(string repoPath)
+    {
+        try
+        {
+            var headFile = Path.Combine(repoPath, ".git", "HEAD");
+            if (File.Exists(headFile))
+            {
+                var content = await File.ReadAllTextAsync(headFile);
+                if (content.StartsWith("ref: refs/heads/"))
+                {
+                    return content.Replace("ref: refs/heads/", "").Trim();
+                }
+            }
+            return "unknown";
+        }
+        catch
+        {
+            return "unknown";
+        }
+    }
+
+    private record RepositoryInfo(
+        string DirectoryStructure,
+        string KeyFilesInfo,
+        string ReadmeContent,
+        string TechnologyStack
+    );
+
+    private RepositoryInfo AnalyzeRepositoryStructure(string repoPath)
+    {
+        var sb = new System.Text.StringBuilder();
+        var keyFiles = new System.Text.StringBuilder();
+        var readme = "Not found";
+        var techStack = new List<string>();
+
+        try
+        {
+            // Get directory structure (top 2 levels)
+            sb.AppendLine("Top-level directories:");
+            var dirs = Directory.GetDirectories(repoPath)
+                .Where(d => !Path.GetFileName(d).StartsWith("."))
+                .Take(20);
+            foreach (var dir in dirs)
+            {
+                var dirName = Path.GetFileName(dir);
+                sb.AppendLine($"  /{dirName}/");
+
+                // List subdirectories
+                try
+                {
+                    var subdirs = Directory.GetDirectories(dir).Take(10);
+                    foreach (var subdir in subdirs)
+                    {
+                        sb.AppendLine($"    /{Path.GetFileName(subdir)}/");
+                    }
+                }
+                catch { }
+            }
+
+            // List top-level files
+            sb.AppendLine("\nTop-level files:");
+            var files = Directory.GetFiles(repoPath).Take(30);
+            foreach (var file in files)
+            {
+                sb.AppendLine($"  {Path.GetFileName(file)}");
+            }
+
+            // Find and read key files
+            var keyFileNames = new[] {
+                "README.md", "README.txt", "README",
+                "*.csproj", "*.sln", "package.json", "pom.xml", "build.gradle",
+                "appsettings.json", "web.config", "app.config"
+            };
+
+            foreach (var pattern in keyFileNames)
+            {
+                try
+                {
+                    var matches = Directory.GetFiles(repoPath, pattern, SearchOption.TopDirectoryOnly);
+                    foreach (var match in matches.Take(5))
+                    {
+                        var fileName = Path.GetFileName(match);
+                        var fileInfo = new FileInfo(match);
+                        keyFiles.AppendLine($"\n{fileName} ({fileInfo.Length} bytes):");
+
+                        // Read content for small files
+                        if (fileInfo.Length < 50000)
+                        {
+                            try
+                            {
+                                var content = File.ReadAllText(match);
+                                keyFiles.AppendLine(content.Length > 1000
+                                    ? content.Substring(0, 1000) + "... (truncated)"
+                                    : content);
+                            }
+                            catch
+                            {
+                                keyFiles.AppendLine("  (could not read)");
+                            }
+                        }
+                        else
+                        {
+                            keyFiles.AppendLine("  (file too large to read)");
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            // Try to read README
+            var readmeFiles = new[] { "README.md", "README.txt", "README" };
+            foreach (var readmeFile in readmeFiles)
+            {
+                var readmePath = Path.Combine(repoPath, readmeFile);
+                if (File.Exists(readmePath))
+                {
+                    try
+                    {
+                        readme = File.ReadAllText(readmePath);
+                        if (readme.Length > 2000)
+                            readme = readme.Substring(0, 2000) + "... (truncated)";
+                        break;
+                    }
+                    catch { }
+                }
+            }
+
+            // Detect technology stack
+            if (Directory.GetFiles(repoPath, "*.csproj", SearchOption.TopDirectoryOnly).Any())
+                techStack.Add(".NET / C#");
+            if (Directory.GetFiles(repoPath, "*.sln", SearchOption.TopDirectoryOnly).Any())
+                techStack.Add("Visual Studio Solution");
+            if (File.Exists(Path.Combine(repoPath, "package.json")))
+                techStack.Add("Node.js / JavaScript");
+            if (File.Exists(Path.Combine(repoPath, "pom.xml")))
+                techStack.Add("Java / Maven");
+            if (File.Exists(Path.Combine(repoPath, "build.gradle")))
+                techStack.Add("Java / Gradle");
+            if (File.Exists(Path.Combine(repoPath, "requirements.txt")))
+                techStack.Add("Python");
+            if (File.Exists(Path.Combine(repoPath, "Cargo.toml")))
+                techStack.Add("Rust");
+            if (Directory.Exists(Path.Combine(repoPath, "src")))
+                techStack.Add("Standard src/ layout");
+            if (Directory.Exists(Path.Combine(repoPath, "tests")) ||
+                Directory.Exists(Path.Combine(repoPath, "test")))
+                techStack.Add("Test suite present");
+
+            if (techStack.Count == 0)
+                techStack.Add("Unknown - no recognized project files");
+        }
+        catch (Exception ex)
+        {
+            sb.AppendLine($"\nError analyzing structure: {ex.Message}");
+        }
+
+        return new RepositoryInfo(
+            DirectoryStructure: sb.ToString(),
+            KeyFilesInfo: keyFiles.ToString(),
+            ReadmeContent: readme,
+            TechnologyStack: string.Join(", ", techStack)
+        );
+    }
+
+    private void ReloadBundle()
+    {
+        if (BundleService.BundlePath != null)
+        {
+            BundleService.ReloadBundle();
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private void HandleDirectorySelected(string path)
+    {
+        directoryPath = path;
+        showDirectoryBrowser = false;
+    }
+
+    private void HandleRepositorySelected(string path)
+    {
+        repositoryPath = path;
+        showRepositoryBrowser = false;
+    }
+
+    private bool GetButtonDisabled()
+    {
+        return isProcessing || string.IsNullOrWhiteSpace(conceptType) || conceptType == "__custom__";
+    }
+
+    private string RenderMarkdown(string markdown)
+    {
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+        return Markdig.Markdown.ToHtml(markdown, pipeline);
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len /= 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
+    }
+}

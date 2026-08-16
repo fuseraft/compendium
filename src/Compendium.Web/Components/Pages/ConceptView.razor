@@ -50,21 +50,14 @@
             </div>
         </div>
 
-        @if (concept.Frontmatter.TryGetValue("sources", out var sourcesObj) && sourcesObj is System.Collections.IEnumerable sources)
+        @if (concept.Frontmatter.TryGetValue("sources", out var sourcesObj) && sourcesObj != null)
         {
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">Sources</h5>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        @foreach (var source in sources)
-                        {
-                            <li class="mb-2">
-                                <small class="text-muted font-monospace">@source</small>
-                            </li>
-                        }
-                    </ul>
+                    @RenderFrontmatterValue(sourcesObj)
                 </div>
             </div>
         }
@@ -76,7 +69,7 @@
                     <h5 class="mb-0">Generation Info</h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-0"><small class="text-muted font-monospace">@genObj</small></p>
+                    @RenderFrontmatterValue(genObj)
                 </div>
             </div>
         }
@@ -114,5 +107,106 @@
             .UseAdvancedExtensions()
             .Build();
         return Markdig.Markdown.ToHtml(markdown, pipeline);
+    }
+
+    private RenderFragment RenderFrontmatterValue(object? value)
+    {
+        return builder =>
+        {
+            if (value == null)
+            {
+                builder.AddContent(0, "N/A");
+                return;
+            }
+
+            // Handle dictionary (like { by: "...", at: "..." })
+            if (value is IDictionary<object, object> dict)
+            {
+                builder.OpenElement(1, "dl");
+                builder.AddAttribute(2, "class", "row mb-0");
+                int seq = 3;
+                foreach (var kvp in dict)
+                {
+                    builder.OpenElement(seq++, "dt");
+                    builder.AddAttribute(seq++, "class", "col-sm-3");
+                    builder.AddContent(seq++, kvp.Key?.ToString() ?? "");
+                    builder.CloseElement();
+
+                    builder.OpenElement(seq++, "dd");
+                    builder.AddAttribute(seq++, "class", "col-sm-9");
+                    builder.AddContent(seq++, kvp.Value?.ToString() ?? "N/A");
+                    builder.CloseElement();
+                }
+                builder.CloseElement();
+            }
+            // Handle list of dictionaries (like sources with id, resource, title)
+            else if (value is System.Collections.IList list && list.Count > 0 && list[0] is IDictionary<object, object>)
+            {
+                builder.OpenElement(10, "ul");
+                builder.AddAttribute(11, "class", "list-unstyled mb-0");
+                int seq = 12;
+                foreach (var item in list)
+                {
+                    if (item is IDictionary<object, object> itemDict)
+                    {
+                        builder.OpenElement(seq++, "li");
+                        builder.AddAttribute(seq++, "class", "mb-3");
+
+                        builder.OpenElement(seq++, "dl");
+                        builder.AddAttribute(seq++, "class", "row mb-0");
+                        foreach (var kvp in itemDict)
+                        {
+                            builder.OpenElement(seq++, "dt");
+                            builder.AddAttribute(seq++, "class", "col-sm-3");
+                            builder.AddContent(seq++, kvp.Key?.ToString() ?? "");
+                            builder.CloseElement();
+
+                            builder.OpenElement(seq++, "dd");
+                            builder.AddAttribute(seq++, "class", "col-sm-9");
+
+                            // Special handling for URLs
+                            var valueStr = kvp.Value?.ToString() ?? "";
+                            if (kvp.Key?.ToString()?.ToLower() == "resource" && Uri.TryCreate(valueStr, UriKind.Absolute, out var uri))
+                            {
+                                builder.OpenElement(seq++, "a");
+                                builder.AddAttribute(seq++, "href", valueStr);
+                                builder.AddAttribute(seq++, "target", "_blank");
+                                builder.AddAttribute(seq++, "rel", "noopener noreferrer");
+                                builder.AddContent(seq++, valueStr);
+                                builder.CloseElement();
+                            }
+                            else
+                            {
+                                builder.AddContent(seq++, valueStr);
+                            }
+
+                            builder.CloseElement();
+                        }
+                        builder.CloseElement();
+                        builder.CloseElement();
+                    }
+                }
+                builder.CloseElement();
+            }
+            // Handle simple list
+            else if (value is IEnumerable<object> enumerable)
+            {
+                builder.OpenElement(20, "ul");
+                builder.AddAttribute(21, "class", "list-unstyled mb-0");
+                int seq = 22;
+                foreach (var item in enumerable)
+                {
+                    builder.OpenElement(seq++, "li");
+                    builder.AddContent(seq++, item?.ToString() ?? "");
+                    builder.CloseElement();
+                }
+                builder.CloseElement();
+            }
+            // Handle simple value
+            else
+            {
+                builder.AddContent(30, value.ToString() ?? "");
+            }
+        };
     }
 }

@@ -11,7 +11,10 @@
     @if (BundleService.CurrentBundle == null)
     {
         <div class="alert alert-warning">
-            <p>No bundle loaded. Configure the bundle path in appsettings.json</p>
+            <h5 class="alert-heading">No Bundle Loaded</h5>
+            <p>You need to load a knowledge bundle to view the catalog.</p>
+            <hr>
+            <a href="/load-bundle" class="btn btn-primary">Load Bundle</a>
         </div>
     }
     else

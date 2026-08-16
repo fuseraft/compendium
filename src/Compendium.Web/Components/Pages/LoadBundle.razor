@@ -1,0 +1,289 @@
+@page "/load-bundle"
+@rendermode InteractiveServer
+@inject Services.BundleService BundleService
+@inject NavigationManager Navigation
+
+<PageTitle>Load Bundle - Compendium</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Load Knowledge Bundle</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Specify the path to an OKF knowledge bundle directory to load.
+                        The path can be absolute or relative to the application directory.
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Error:</strong> @errorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <strong>Success:</strong> @successMessage
+                        </div>
+                    }
+
+                    @if (availableBundles.Count > 0)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Available Bundles</label>
+                            <div class="list-group">
+                                @foreach (var bundle in availableBundles)
+                                {
+                                    <button type="button"
+                                            class="list-group-item list-group-item-action @(bundlePath == bundle.Path ? "active" : "")"
+                                            @onclick="() => SelectBundle(bundle.Path)"
+                                            disabled="@isLoading">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">@bundle.Name</h6>
+                                            <small>@bundle.ConceptCount concepts</small>
+                                        </div>
+                                        <small class="text-muted">@bundle.Path</small>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="bundlePath" class="form-label">
+                            @(availableBundles.Count > 0 ? "Or enter path manually" : "Bundle Path")
+                        </label>
+                        <input type="text"
+                               class="form-control @(isValidating ? "is-invalid" : "")"
+                               id="bundlePath"
+                               @bind="bundlePath"
+                               placeholder="e.g., catalog/sample or C:\path\to\bundle"
+                               disabled="@isLoading" />
+                        <div class="form-text">
+                            Enter an absolute or relative path to a bundle directory
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" @onclick="HandleLoadBundle" disabled="@(isLoading || string.IsNullOrWhiteSpace(bundlePath))">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <span>Loading...</span>
+                            }
+                            else
+                            {
+                                <span>Load Bundle</span>
+                            }
+                        </button>
+
+                        @if (BundleService.CurrentBundle != null)
+                        {
+                            <button class="btn btn-secondary" @onclick="GoToHome">
+                                Go to Catalog
+                            </button>
+                        }
+                    </div>
+
+                    @if (BundleService.CurrentBundle != null)
+                    {
+                        <div class="mt-4 pt-3 border-top">
+                            <h5>Current Bundle</h5>
+                            <dl class="row mb-0">
+                                <dt class="col-sm-3">Path:</dt>
+                                <dd class="col-sm-9"><code>@BundleService.BundlePath</code></dd>
+
+                                <dt class="col-sm-3">Concepts:</dt>
+                                <dd class="col-sm-9">@BundleService.CurrentBundle.Concepts.Count</dd>
+                            </dl>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Bundle Structure</h5>
+                </div>
+                <div class="card-body">
+                    <p>An OKF bundle directory should contain:</p>
+                    <ul>
+                        <li><code>index.md</code> - Bundle index file</li>
+                        <li>One or more subdirectories with <code>.md</code> files containing concepts</li>
+                        <li>Optional <code>references/</code> directory for source documents</li>
+                    </ul>
+                    <p class="mb-0">
+                        <strong>Example:</strong> The sample bundle is located at <code>catalog/sample/</code> relative to the repository root.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string bundlePath = "";
+    private bool isLoading = false;
+    private bool isValidating = false;
+    private string? errorMessage = null;
+    private string? successMessage = null;
+    private List<BundleInfo> availableBundles = new();
+
+    private record BundleInfo(string Name, string Path, int ConceptCount);
+
+    protected override void OnInitialized()
+    {
+        // Scan for available bundles
+        ScanForBundles();
+
+        // Pre-fill with current bundle path if available
+        if (!string.IsNullOrEmpty(BundleService.BundlePath))
+        {
+            bundlePath = BundleService.BundlePath;
+        }
+        else if (availableBundles.Count > 0)
+        {
+            // Auto-select first available bundle
+            bundlePath = availableBundles[0].Path;
+        }
+        else
+        {
+            // Suggest default path
+            bundlePath = "../../catalog/sample";
+        }
+    }
+
+    private void ScanForBundles()
+    {
+        var searchPaths = new[]
+        {
+            "catalog",
+            "../catalog",
+            "../../catalog",
+            Path.Combine(Directory.GetCurrentDirectory(), "catalog"),
+            Path.Combine(Directory.GetCurrentDirectory(), "..", "catalog"),
+            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "catalog")
+        };
+
+        var foundBundles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var searchPath in searchPaths)
+        {
+            try
+            {
+                var resolvedPath = Path.IsPathRooted(searchPath)
+                    ? searchPath
+                    : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), searchPath));
+
+                if (!Directory.Exists(resolvedPath))
+                    continue;
+
+                // Look for subdirectories that contain an index.md file (OKF bundles)
+                foreach (var dir in Directory.GetDirectories(resolvedPath))
+                {
+                    var indexPath = Path.Combine(dir, "index.md");
+                    if (File.Exists(indexPath) && !foundBundles.Contains(dir))
+                    {
+                        foundBundles.Add(dir);
+                        var name = Path.GetFileName(dir);
+                        var conceptCount = CountConcepts(dir);
+                        availableBundles.Add(new BundleInfo(name, dir, conceptCount));
+                    }
+                }
+
+                // Also check if the catalog directory itself is a bundle
+                var catalogIndexPath = Path.Combine(resolvedPath, "index.md");
+                if (File.Exists(catalogIndexPath) && !foundBundles.Contains(resolvedPath))
+                {
+                    foundBundles.Add(resolvedPath);
+                    var name = Path.GetFileName(resolvedPath);
+                    var conceptCount = CountConcepts(resolvedPath);
+                    availableBundles.Add(new BundleInfo(name, resolvedPath, conceptCount));
+                }
+            }
+            catch
+            {
+                // Ignore errors scanning individual paths
+            }
+        }
+
+        availableBundles = availableBundles.OrderBy(b => b.Name).ToList();
+    }
+
+    private int CountConcepts(string bundlePath)
+    {
+        try
+        {
+            return Directory.GetFiles(bundlePath, "*.md", SearchOption.AllDirectories)
+                .Count(f => !f.EndsWith("index.md", StringComparison.OrdinalIgnoreCase));
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
+    private void SelectBundle(string path)
+    {
+        bundlePath = path;
+        errorMessage = null;
+        isValidating = false;
+    }
+
+    private async Task HandleLoadBundle()
+    {
+        if (string.IsNullOrWhiteSpace(bundlePath))
+            return;
+
+        isLoading = true;
+        isValidating = false;
+        errorMessage = null;
+        successMessage = null;
+        StateHasChanged();
+
+        await Task.Delay(100); // Let UI update
+
+        try
+        {
+            // Try to resolve relative paths from current directory
+            var resolvedPath = Path.IsPathRooted(bundlePath)
+                ? bundlePath
+                : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), bundlePath));
+
+            if (!Directory.Exists(resolvedPath))
+            {
+                isValidating = true;
+                errorMessage = $"Directory not found: {resolvedPath}";
+                return;
+            }
+
+            BundleService.LoadBundle(resolvedPath);
+
+            successMessage = $"Successfully loaded bundle with {BundleService.CurrentBundle?.Concepts.Count ?? 0} concepts!";
+
+            // Navigate to home after a short delay
+            await Task.Delay(1500);
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            isValidating = true;
+            errorMessage = $"Failed to load bundle: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void GoToHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

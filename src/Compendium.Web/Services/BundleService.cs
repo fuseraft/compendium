@@ -23,4 +23,16 @@ public class BundleService
             _bundle = BundleLoader.LoadBundle(_bundlePath);
         }
     }
+
+    public List<string> GetConceptTypes()
+    {
+        if (_bundle == null)
+            return new List<string>();
+
+        return _bundle.Concepts.Values
+            .Select(c => c.Type)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToList();
+    }
 }

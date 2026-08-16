@@ -115,6 +115,124 @@ public sealed class CompendiumTools
         return result.Message;
     }
 
+    [Description("Read the contents of a file from the filesystem. Use this to read source code, configuration files, documentation, or any other text files you need to analyze.")]
+    public string ReadFile([Description("The absolute or relative path to the file to read.")] string path)
+    {
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return $"File not found: {path}";
+            }
+
+            var fileInfo = new FileInfo(path);
+            if (fileInfo.Length > 1_000_000) // 1MB limit
+            {
+                return $"File too large to read (>{fileInfo.Length:N0} bytes): {path}";
+            }
+
+            var content = File.ReadAllText(path);
+            return $"=== {path} ({fileInfo.Length:N0} bytes) ===\n{content}";
+        }
+        catch (Exception ex)
+        {
+            return $"Error reading {path}: {ex.Message}";
+        }
+    }
+
+    [Description("List files in a directory, optionally filtered by pattern (e.g. '*.sql', '*.cs'). Returns file names with sizes and last modified dates.")]
+    public string ListFiles(
+        [Description("The directory path to list files from.")] string path,
+        [Description("Optional file pattern like '*.sql' or '*.cs'. Use '*' for all files.")] string? pattern = "*",
+        [Description("Include subdirectories recursively. Default is false.")] bool recursive = false)
+    {
+        try
+        {
+            if (!Directory.Exists(path))
+            {
+                return $"Directory not found: {path}";
+            }
+
+            var searchOption = recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var files = Directory.GetFiles(path, pattern ?? "*", searchOption)
+                .Select(f => new FileInfo(f))
+                .OrderBy(f => f.FullName)
+                .Take(500); // Limit to 500 files
+
+            var lines = files.Select(f =>
+            {
+                var relativePath = Path.GetRelativePath(path, f.FullName);
+                return $"{relativePath} ({f.Length:N0} bytes, modified {f.LastWriteTime:yyyy-MM-dd})";
+            });
+
+            var result = string.Join('\n', lines);
+            return result.Length == 0 ? $"No files found matching '{pattern}' in {path}" : result;
+        }
+        catch (Exception ex)
+        {
+            return $"Error listing files in {path}: {ex.Message}";
+        }
+    }
+
+    [Description("Get a recursive directory tree structure showing folders and file counts. Useful for understanding repository organization.")]
+    public string ReadDirectoryStructure(
+        [Description("The directory path to analyze.")] string path,
+        [Description("Maximum depth to traverse. Default is 3 levels.")] int maxDepth = 3)
+    {
+        try
+        {
+            if (!Directory.Exists(path))
+            {
+                return $"Directory not found: {path}";
+            }
+
+            var lines = new List<string>();
+            lines.Add($"Directory structure of: {path}");
+            lines.Add("");
+
+            void TraverseDirectory(string dir, int depth, string indent)
+            {
+                if (depth > maxDepth) return;
+
+                try
+                {
+                    var dirInfo = new DirectoryInfo(dir);
+                    var subdirs = dirInfo.GetDirectories()
+                        .Where(d => !d.Attributes.HasFlag(FileAttributes.System) &&
+                                   !d.Attributes.HasFlag(FileAttributes.Hidden) &&
+                                   !d.Name.StartsWith('.'))
+                        .OrderBy(d => d.Name)
+                        .ToList();
+
+                    var files = dirInfo.GetFiles().Length;
+
+                    foreach (var subdir in subdirs)
+                    {
+                        var subfiles = subdir.GetFiles("*", SearchOption.AllDirectories).Length;
+                        lines.Add($"{indent}📁 {subdir.Name}/ ({subfiles} files)");
+                        TraverseDirectory(subdir.FullName, depth + 1, indent + "  ");
+                    }
+
+                    if (depth == 0 && files > 0)
+                    {
+                        lines.Add($"{indent}({files} files in root)");
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    lines.Add($"{indent}⚠️ Access denied");
+                }
+            }
+
+            TraverseDirectory(path, 0, "");
+            return string.Join('\n', lines);
+        }
+        catch (Exception ex)
+        {
+            return $"Error reading directory structure: {ex.Message}";
+        }
+    }
+
     private void Reload(WriteResult result)
     {
         if (result.Success)

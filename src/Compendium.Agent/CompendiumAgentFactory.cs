@@ -53,6 +53,9 @@ public static class CompendiumAgentFactory
             AIFunctionFactory.Create(tools.ListConcepts),
             AIFunctionFactory.Create(tools.ReadConcept),
             AIFunctionFactory.Create(tools.SearchConcepts),
+            AIFunctionFactory.Create(tools.ReadFile),
+            AIFunctionFactory.Create(tools.ListFiles),
+            AIFunctionFactory.Create(tools.ReadDirectoryStructure),
         };
 
         var writeTools = allowWrite

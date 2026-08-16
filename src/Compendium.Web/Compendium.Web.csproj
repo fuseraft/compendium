@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Compendium.Okf\Compendium.Okf.csproj" />
     <ProjectReference Include="..\Compendium.Agent\Compendium.Agent.csproj" />
+    <ProjectReference Include="..\Compendium.Ingest\Compendium.Ingest.csproj" />
   </ItemGroup>
 
   <ItemGroup>

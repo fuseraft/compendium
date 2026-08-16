@@ -1,0 +1,269 @@
+@page "/settings"
+@rendermode InteractiveServer
+@inject Services.LlmConfigService LlmConfigService
+@inject Services.BundleService BundleService
+@inject NavigationManager Navigation
+
+<PageTitle>Settings - Compendium</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Settings</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Language Model Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Configure your LLM provider to enable the chat interface.
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Error:</strong> @errorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <strong>Success:</strong> @successMessage
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="baseUrl" class="form-label">Provider URL</label>
+                        <input type="text"
+                               class="form-control"
+                               id="baseUrl"
+                               @bind="baseUrl"
+                               placeholder="e.g., http://localhost:11434/v1"
+                               disabled="@isLoadingModels" />
+                        <div class="form-text">
+                            Examples: <code>http://localhost:11434/v1</code> (Ollama), <code>https://api.openai.com/v1</code> (OpenAI)
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="apiKey" class="form-label">API Key</label>
+                        <input type="password"
+                               class="form-control"
+                               id="apiKey"
+                               @bind="apiKey"
+                               placeholder="Enter API key (use 'not-used' for Ollama)"
+                               disabled="@isLoadingModels" />
+                        <div class="form-text">
+                            For Ollama, any value works (e.g., <code>not-used</code>). For cloud providers, enter your API key.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button class="btn btn-secondary" @onclick="FetchModels" disabled="@(isLoadingModels || string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(apiKey))">
+                            @if (isLoadingModels)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <span>Loading models...</span>
+                            }
+                            else
+                            {
+                                <span>Fetch Available Models</span>
+                            }
+                        </button>
+                    </div>
+
+                    @if (availableModels.Count > 0)
+                    {
+                        <div class="mb-3">
+                            <label for="modelName" class="form-label">Model</label>
+                            <select class="form-select"
+                                    id="modelName"
+                                    @bind="modelName"
+                                    disabled="@isSaving">
+                                <option value="">-- Select a model --</option>
+                                @foreach (var model in availableModels)
+                                {
+                                    <option value="@model">@model</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" @onclick="SaveConfiguration" disabled="@(isSaving || string.IsNullOrWhiteSpace(modelName))">
+                                @if (isSaving)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Saving...</span>
+                                }
+                                else
+                                {
+                                    <span>Save Configuration</span>
+                                }
+                            </button>
+
+                            @if (LlmConfigService.IsConfigured)
+                            {
+                                <a href="/chat" class="btn btn-success">Go to Chat</a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Current Configuration</h5>
+                </div>
+                <div class="card-body">
+                    @if (LlmConfigService.IsConfigured)
+                    {
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3">Provider URL:</dt>
+                            <dd class="col-sm-9"><code>@LlmConfigService.BaseUrl</code></dd>
+
+                            <dt class="col-sm-3">API Key:</dt>
+                            <dd class="col-sm-9"><code>***</code> (hidden)</dd>
+
+                            <dt class="col-sm-3">Model:</dt>
+                            <dd class="col-sm-9"><code>@LlmConfigService.ModelName</code></dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No LLM configured yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Start</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Using Ollama (Recommended)</h6>
+                    <ol class="small">
+                        <li>Install Ollama from <a href="https://ollama.ai" target="_blank">ollama.ai</a></li>
+                        <li>Pull a model: <code>ollama pull llama3.1</code></li>
+                        <li>Ollama runs on <code>http://localhost:11434</code></li>
+                        <li>Use URL: <code>http://localhost:11434/v1</code></li>
+                        <li>Use API key: <code>not-used</code></li>
+                        <li>Click "Fetch Available Models"</li>
+                        <li>Select your model and save</li>
+                    </ol>
+
+                    <p class="small text-muted mt-2">
+                        <strong>Note:</strong> Your API key is stored securely in Windows Credential Manager.
+                        Settings are saved to <code>~/.compendium/llm-config.json</code>.
+                    </p>
+
+                    <hr>
+
+                    <h6>Using OpenAI</h6>
+                    <ol class="small">
+                        <li>Get API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a></li>
+                        <li>Use URL: <code>https://api.openai.com/v1</code></li>
+                        <li>Enter your API key</li>
+                        <li>Click "Fetch Available Models"</li>
+                        <li>Select your model and save</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string baseUrl = "";
+    private string apiKey = "";
+    private string modelName = "";
+    private List<string> availableModels = new();
+    private bool isLoadingModels = false;
+    private bool isSaving = false;
+    private string? errorMessage = null;
+    private string? successMessage = null;
+
+    protected override void OnInitialized()
+    {
+        // Pre-fill with current config if available
+        if (LlmConfigService.IsConfigured)
+        {
+            baseUrl = LlmConfigService.BaseUrl ?? "";
+            apiKey = LlmConfigService.ApiKey ?? "";
+            modelName = LlmConfigService.ModelName ?? "";
+        }
+        else
+        {
+            // Suggest default Ollama endpoint
+            baseUrl = "http://localhost:11434/v1";
+            apiKey = "not-used";
+        }
+    }
+
+    private async Task FetchModels()
+    {
+        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(apiKey))
+            return;
+
+        isLoadingModels = true;
+        errorMessage = null;
+        successMessage = null;
+        availableModels.Clear();
+        StateHasChanged();
+
+        await Task.Delay(100); // Let UI update
+
+        try
+        {
+            availableModels = await LlmConfigService.FetchAvailableModelsAsync(baseUrl, apiKey);
+            successMessage = $"Found {availableModels.Count} model(s)!";
+
+            // Auto-select first model if none selected
+            if (string.IsNullOrEmpty(modelName) && availableModels.Count > 0)
+            {
+                modelName = availableModels[0];
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoadingModels = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveConfiguration()
+    {
+        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(modelName))
+            return;
+
+        isSaving = true;
+        errorMessage = null;
+        successMessage = null;
+        StateHasChanged();
+
+        await Task.Delay(100);
+
+        try
+        {
+            await LlmConfigService.ConfigureAsync(baseUrl, apiKey, modelName);
+            var keyStore = LlmConfigService.GetKeyStoreInfo();
+            successMessage = $"Configuration saved to {keyStore}! You can now use the chat interface.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to save: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+            StateHasChanged();
+        }
+    }
+}

@@ -11,6 +11,17 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
+builder.Services.AddSingleton<LlmConfigService>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var service = new LlmConfigService();
+    // Load from persistent storage first (async in background)
+    _ = service.LoadAsync();
+    // Fallback to appsettings.json
+    service.LoadFromConfiguration(config);
+    return service;
+});
+
 builder.Services.AddSingleton<BundleService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
@@ -22,6 +33,8 @@ builder.Services.AddSingleton<BundleService>(sp =>
     }
     return service;
 });
+
+builder.Services.AddSingleton<IngestionService>();
 
 var app = builder.Build();
 
