@@ -1,0 +1,39 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+PRIVATE.md
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Claude Code
+.claude/settings.local.json
+
+# Working/scratch OKF bundles not meant for the public repo
+catalog/intcat/

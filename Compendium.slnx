@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Compendium.Agent/Compendium.Agent.csproj" />
+    <Project Path="src/Compendium.Cli/Compendium.Cli.csproj" />
+    <Project Path="src/Compendium.Ingest/Compendium.Ingest.csproj" />
+    <Project Path="src/Compendium.Okf/Compendium.Okf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Compendium.Agent.Tests/Compendium.Agent.Tests.csproj" />
+    <Project Path="tests/Compendium.Ingest.Tests/Compendium.Ingest.Tests.csproj" />
+    <Project Path="tests/Compendium.Okf.Tests/Compendium.Okf.Tests.csproj" />
+  </Folder>
+</Solution>

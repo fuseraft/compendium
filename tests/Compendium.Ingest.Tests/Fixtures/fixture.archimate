@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Sample Model" id="model-1" version="4.9.0">
+  <folder name="Business" id="folder-business" type="business">
+    <element xsi:type="archimate:BusinessActor" id="e-customer" name="Customer"/>
+  </folder>
+  <folder name="Application" id="folder-application" type="application">
+    <element xsi:type="archimate:ApplicationComponent" id="e-order" name="Order Service"/>
+    <element xsi:type="archimate:ApplicationComponent" id="e-payment" name="Payment Gateway"/>
+  </folder>
+  <folder name="Technology" id="folder-technology" type="technology">
+    <element xsi:type="archimate:Node" id="e-appserver" name="App Server"/>
+  </folder>
+  <folder name="Relations" id="folder-relations" type="relations">
+    <element xsi:type="archimate:ServingRelationship" id="r-1" source="e-order" target="e-customer" name="serves"/>
+    <element xsi:type="archimate:ServingRelationship" id="r-2" source="e-payment" target="e-order"/>
+    <element xsi:type="archimate:AssignmentRelationship" id="r-3" source="e-appserver" target="e-order"/>
+  </folder>
+  <folder name="Views" id="folder-views" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" id="v-1" name="Overview">
+      <child xsi:type="archimate:DiagramObject" id="child-1" archimateElement="e-order"/>
+      <child xsi:type="archimate:DiagramObject" id="child-2" archimateElement="e-customer">
+        <sourceConnection xsi:type="archimate:Connection" id="conn-1" source="child-1" target="child-2" archimateRelationship="r-1"/>
+      </child>
+    </element>
+  </folder>
+</archimate:model>
