@@ -35,14 +35,37 @@ That means the catalog is:
 
 ## How it fits together
 
-```
-   Enterprise sources                    Compendium                      Consumers
-  ┌──────────────────┐            ┌─────────────────────────┐        ┌──────────────────┐
-  │ SharePoint       │            │  Connectors             │        │ Compendium       │
-  │ Confluence       │ ──ingest──▶│  Enrichment / curation │──────▶ │ system agent     │
-  │ Markdown wikis   │            │  OKF bundle (git)       │        │ (Q&A + curation) │
-  │ ...              │            └─────────────────────────┘        └──────────────────┘
-  └──────────────────┘
+```mermaid
+graph LR
+    subgraph Sources["Enterprise Sources"]
+        SP[SharePoint]
+        CF[Confluence]
+        MW[Markdown wikis]
+        OT[...]
+    end
+    
+    subgraph Compendium["Compendium"]
+        CN[Connectors]
+        EC[Enrichment / curation]
+        BN[OKF bundle<br/>git]
+    end
+    
+    subgraph Consumers["Consumers"]
+        AG[Compendium<br/>system agent<br/>Q&A + curation]
+    end
+    
+    SP -->|ingest| CN
+    CF -->|ingest| CN
+    MW -->|ingest| CN
+    OT -->|ingest| CN
+    
+    CN --> EC
+    EC --> BN
+    BN --> AG
+    
+    style Sources fill:#e1f5ff
+    style Compendium fill:#fff4e1
+    style Consumers fill:#e8f5e9
 ```
 
 1. **Connectors** pull source documents from wherever the enterprise
