@@ -1,0 +1,118 @@
+@page "/concept/{*ConceptId}"
+@using Compendium.Okf
+@using Markdig
+@inject Services.BundleService BundleService
+@inject NavigationManager Navigation
+
+<PageTitle>@(concept?.Title ?? "Concept") - Compendium</PageTitle>
+
+<div class="container mt-4">
+    @if (concept == null)
+    {
+        <div class="alert alert-danger">
+            Concept not found
+        </div>
+        <a href="/" class="btn btn-secondary">Back to Catalog</a>
+    }
+    else
+    {
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Catalog</a></li>
+                <li class="breadcrumb-item active">@concept.Title</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <h1>@concept.Title</h1>
+                <p class="lead text-muted">@concept.Description</p>
+            </div>
+            <div>
+                <span class="badge bg-primary fs-6">@concept.Type</span>
+                <span class="badge @GetStatusBadgeClass(concept.Status) fs-6 ms-2">@concept.Status</span>
+            </div>
+        </div>
+
+        @if (concept.Frontmatter.TryGetValue("tags", out var tagsObj) && tagsObj is System.Collections.IEnumerable tags)
+        {
+            <div class="mb-3">
+                @foreach (var tag in tags)
+                {
+                    <span class="badge bg-secondary me-1">@tag</span>
+                }
+            </div>
+        }
+
+        <div class="card mb-4">
+            <div class="card-body markdown-content">
+                @((MarkupString)RenderMarkdown(concept.Body))
+            </div>
+        </div>
+
+        @if (concept.Frontmatter.TryGetValue("sources", out var sourcesObj) && sourcesObj is System.Collections.IEnumerable sources)
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Sources</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var source in sources)
+                        {
+                            <li class="mb-2">
+                                <small class="text-muted font-monospace">@source</small>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        @if (concept.Frontmatter.TryGetValue("generated", out var genObj) && genObj != null)
+        {
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Generation Info</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0"><small class="text-muted font-monospace">@genObj</small></p>
+                </div>
+            </div>
+        }
+
+        <div class="mb-4">
+            <a href="/" class="btn btn-secondary">Back to Catalog</a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? ConceptId { get; set; }
+
+    private Concept? concept;
+
+    protected override void OnInitialized()
+    {
+        if (BundleService.CurrentBundle != null && ConceptId != null)
+        {
+            BundleService.CurrentBundle.Concepts.TryGetValue(ConceptId, out concept);
+        }
+    }
+
+    private string GetStatusBadgeClass(string status) => status.ToLower() switch
+    {
+        "stable" => "bg-success",
+        "draft" => "bg-warning",
+        _ => "bg-secondary"
+    };
+
+    private string RenderMarkdown(string markdown)
+    {
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+        return Markdig.Markdown.ToHtml(markdown, pipeline);
+    }
+}

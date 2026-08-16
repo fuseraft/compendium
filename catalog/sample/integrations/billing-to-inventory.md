@@ -13,9 +13,9 @@ sources:
 
 # How it works
 
-When the [Billing Service](/systems/billing-service.md) confirms payment, it
+When the [Billing Service](../systems/billing-service.md) confirms payment, it
 publishes a `payment.settled` event that the
-[Inventory Service](/systems/inventory-service.md) consumes to release the
+[Inventory Service](../systems/inventory-service.md) consumes to release the
 stock reservation held for that order.[^integration-adr]
 
 [^integration-adr]: ADR-014 Billing/Inventory decoupling

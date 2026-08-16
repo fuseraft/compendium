@@ -12,5 +12,5 @@ generated: { by: human:compendium-team, at: 2026-08-16T00:00:00Z }
 The Inventory Service tracks on-hand stock per SKU and holds a reservation
 against pending orders so the same unit can't be sold twice. Reservations
 are released either when payment settles (see
-[billing-to-inventory](/integrations/billing-to-inventory.md)) or when an
+[billing-to-inventory](../integrations/billing-to-inventory.md)) or when an
 order is cancelled.

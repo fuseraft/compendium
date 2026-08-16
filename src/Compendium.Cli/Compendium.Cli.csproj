@@ -15,6 +15,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>..\compendium.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>

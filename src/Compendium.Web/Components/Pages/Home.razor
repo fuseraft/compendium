@@ -1,0 +1,101 @@
+@page "/"
+@rendermode InteractiveServer
+@using Compendium.Okf
+@inject Services.BundleService BundleService
+
+<PageTitle>Compendium</PageTitle>
+
+<div class="container">
+    <h1 class="mt-4 mb-4">Knowledge Catalog</h1>
+
+    @if (BundleService.CurrentBundle == null)
+    {
+        <div class="alert alert-warning">
+            <p>No bundle loaded. Configure the bundle path in appsettings.json</p>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <input type="text" class="form-control" placeholder="Search concepts..."
+                   @bind="searchQuery" @bind:event="oninput" @onkeyup="FilterConcepts" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Filter by type:</label>
+            <select class="form-select" @bind="selectedType" @bind:after="FilterConcepts">
+                <option value="">All Types</option>
+                @foreach (var type in conceptTypes)
+                {
+                    <option value="@type">@type</option>
+                }
+            </select>
+        </div>
+
+        <div class="row">
+            @foreach (var concept in filteredConcepts)
+            {
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="/concept/@Uri.EscapeDataString(concept.Id)" class="text-decoration-none">
+                                    @concept.Title
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted small">@concept.Description</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">@concept.Type</span>
+                                <span class="badge @GetStatusBadgeClass(concept.Status)">@concept.Status</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (filteredConcepts.Count == 0)
+        {
+            <div class="alert alert-info">
+                No concepts found matching your search.
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<Concept> allConcepts = new();
+    private List<Concept> filteredConcepts = new();
+    private HashSet<string> conceptTypes = new();
+    private string searchQuery = "";
+    private string selectedType = "";
+
+    protected override void OnInitialized()
+    {
+        if (BundleService.CurrentBundle != null)
+        {
+            allConcepts = BundleService.CurrentBundle.Concepts.Values
+                .OrderBy(c => c.Title)
+                .ToList();
+            conceptTypes = allConcepts.Select(c => c.Type).Distinct().OrderBy(t => t).ToHashSet();
+            filteredConcepts = allConcepts;
+        }
+    }
+
+    private void FilterConcepts()
+    {
+        filteredConcepts = allConcepts
+            .Where(c => string.IsNullOrEmpty(selectedType) || c.Type == selectedType)
+            .Where(c => string.IsNullOrEmpty(searchQuery) ||
+                        c.Title.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        c.Description.Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private string GetStatusBadgeClass(string status) => status.ToLower() switch
+    {
+        "stable" => "bg-success",
+        "draft" => "bg-warning",
+        _ => "bg-secondary"
+    };
+}

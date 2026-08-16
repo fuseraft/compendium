@@ -1,0 +1,130 @@
+@page "/chat"
+@rendermode InteractiveServer
+@using Compendium.Agent
+@using Microsoft.Extensions.AI
+@inject Services.BundleService BundleService
+@inject IConfiguration Configuration
+
+<PageTitle>Chat - Compendium</PageTitle>
+
+<div class="container-fluid h-100 d-flex flex-column">
+    <div class="row mt-3">
+        <div class="col">
+            <h1>Chat with Compendium Agent</h1>
+        </div>
+    </div>
+
+    <div class="row flex-grow-1 overflow-hidden">
+        <div class="col">
+            <div class="card h-100 d-flex flex-column">
+                <div class="card-body flex-grow-1 overflow-auto" id="chatMessages" style="max-height: calc(100vh - 250px);">
+                    @if (messages.Count == 0)
+                    {
+                        <div class="text-center text-muted mt-5">
+                            <p>Ask me anything about the knowledge catalog.</p>
+                            <p class="small">I can list concepts, search, and answer questions based on the loaded bundle.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var msg in messages)
+                        {
+                            <div class="mb-3 @(msg.Role == "user" ? "text-end" : "")">
+                                <div class="d-inline-block p-3 rounded @(msg.Role == "user" ? "bg-primary text-white" : "bg-light")"
+                                     style="max-width: 80%;">
+                                    <strong>@(msg.Role == "user" ? "You" : "Agent"):</strong>
+                                    <div class="mt-1">@msg.Text</div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (isProcessing)
+                        {
+                            <div class="mb-3">
+                                <div class="d-inline-block p-3 rounded bg-light" style="max-width: 80%;">
+                                    <div class="spinner-border spinner-border-sm" role="status">
+                                        <span class="visually-hidden">Processing...</span>
+                                    </div>
+                                    <span class="ms-2">Thinking...</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Ask a question..."
+                               @bind="userInput" @onkeydown="HandleKeyPress" disabled="@isProcessing" />
+                        <button class="btn btn-primary" @onclick="SendMessage" disabled="@(isProcessing || string.IsNullOrWhiteSpace(userInput))">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ChatMessage> messages = new();
+    private string userInput = "";
+    private bool isProcessing = false;
+    private Microsoft.Agents.AI.AIAgent? agent;
+    private Microsoft.Agents.AI.AgentSession? session;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (BundleService.CurrentBundle == null)
+            return;
+
+        var baseUrl = Configuration["LLM:BaseUrl"];
+        var apiKey = Configuration["LLM:ApiKey"];
+        var modelName = Configuration["LLM:ModelName"];
+
+        if (!string.IsNullOrEmpty(baseUrl) && !string.IsNullOrEmpty(apiKey) && !string.IsNullOrEmpty(modelName))
+        {
+            var settings = new AgentSettings { BaseUrl = baseUrl, ApiKey = apiKey, Model = modelName };
+            var tools = new CompendiumTools(BundleService.CurrentBundle);
+            agent = CompendiumAgentFactory.Create(settings, tools, allowWrite: false);
+            session = await agent.CreateSessionAsync();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userInput) || agent == null || session == null)
+            return;
+
+        var question = userInput;
+        userInput = "";
+
+        messages.Add(new ChatMessage("user", question));
+        isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await agent.RunAsync(question, session);
+            messages.Add(new ChatMessage("assistant", response.Text));
+        }
+        catch (Exception ex)
+        {
+            messages.Add(new ChatMessage("assistant", $"Error: {ex.Message}"));
+        }
+        finally
+        {
+            isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !isProcessing)
+        {
+            await SendMessage();
+        }
+    }
+
+    private record ChatMessage(string Role, string Text);
+}

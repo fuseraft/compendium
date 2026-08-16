@@ -15,5 +15,5 @@ processor, and is the system of record for whether an order has been paid.
 # Integrations
 
 Once payment settles, Billing publishes an event consumed by
-[Inventory](/systems/inventory-service.md), described in the
-[billing-to-inventory integration](/integrations/billing-to-inventory.md).
+[Inventory](inventory-service.md), described in the
+[billing-to-inventory integration](../integrations/billing-to-inventory.md).

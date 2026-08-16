@@ -37,11 +37,11 @@ That means the catalog is:
 
 ```
    Enterprise sources                    Compendium                      Consumers
-  ┌──────────────────┐            ┌─────────────────────────┐        ┌────────────────┐
-  │ SharePoint        │           │  Connectors              │        │ Compendium      │
-  │ Confluence        │──ingest──▶│  Enrichment / curation   │──────▶ │ system agent    │
-  │ Markdown wikis     │          │  OKF bundle (git)        │        │ (Q&A + curation)│
-  │ ...                │          └─────────────────────────┘        └────────────────┘
+  ┌──────────────────┐            ┌─────────────────────────┐        ┌──────────────────┐
+  │ SharePoint       │            │  Connectors             │        │ Compendium       │
+  │ Confluence       │ ──ingest──▶│  Enrichment / curation │──────▶ │ system agent     │
+  │ Markdown wikis   │            │  OKF bundle (git)       │        │ (Q&A + curation) │
+  │ ...              │            └─────────────────────────┘        └──────────────────┘
   └──────────────────┘
 ```
 
@@ -89,29 +89,133 @@ catalog. It is expected to:
   rather than improvised, and able to point back to the concept (and its
   `sources`) an answer came from.
 
+## Installation
+
+### From Source
+
+Build the CLI and optionally install it system-wide:
+
+```bash
+# Build
+./build.sh              # Linux/macOS
+.\build.ps1             # Windows
+
+# The CLI is now at ./bin/cli/Compendium.Cli
+# To use it without the path prefix, add bin/cli/ to your PATH
+# or copy the executable to a directory already in your PATH
+```
+
+### From GitHub Releases (when available)
+
+```bash
+# Linux/macOS
+curl -fsSL https://raw.githubusercontent.com/fuseraft/compendium/main/install.sh | bash
+
+# Windows (PowerShell)
+irm https://raw.githubusercontent.com/fuseraft/compendium/main/install.ps1 | iex
+```
+
+## Building from Source
+
+### Quick Build
+
+```bash
+# Linux/macOS
+./build.sh
+
+# Windows
+.\build.ps1
+```
+
+The default target builds and publishes the CLI to `bin/cli/`.
+
+### Build Targets
+
+- `Build` - Compile all projects
+- `Test` - Run all tests
+- `PublishCli` - Publish CLI (default)
+- `PublishWeb` - Publish Web server
+- `PublishAll` - Publish both CLI and Web
+- `Pack` - Create distribution archives
+- `Lint` - Check code formatting
+
+### Examples
+
+```bash
+# Build both CLI and Web
+./build.sh --target=PublishAll
+
+# Create self-contained Linux binary
+./build.sh --target=Pack --runtime=linux-x64
+
+# Windows self-contained binary
+.\build.ps1 -Target Pack -Runtime win-x64
+
+# Debug build
+.\build.ps1 -Configuration Debug -Target Build
+```
+
 ## Setup
 
 Compendium talks to any OpenAI-compatible provider (a litellm proxy, for
-example) via a base URL, API key, and model name. Configure it
-interactively — it will offer a pick-list of available models fetched from
-the provider:
+example) via a base URL, API key, and model name. 
 
-```
-dotnet run --project src/Compendium.Cli -- init
+First, build the CLI:
+
+```bash
+./build.sh              # Linux/macOS
+.\build.ps1             # Windows
 ```
 
-Then start chatting with the system agent:
+Then configure it interactively — it will offer a pick-list of available 
+models fetched from the provider:
 
+```bash
+compendium init
 ```
-dotnet run --project src/Compendium.Cli -- chat --bundle catalog/sample
+
+## Using Compendium
+
+### Web UI
+
+Run the Blazor Server web interface for a visual catalog browser and chat:
+
+```bash
+# Build the web server
+./build.sh --target=PublishWeb    # Linux/macOS
+.\build.ps1 -Target PublishWeb    # Windows
+
+# Run the server
+./bin/web/Compendium.Web          # Linux/macOS
+.\bin\web\Compendium.Web.exe      # Windows
+```
+
+Then open http://localhost:5050 in your browser. The web UI provides:
+- **Catalog browser** with filtering and search
+- **Concept viewer** with rendered markdown
+- **Chat interface** for asking questions
+- **REST API** at `/api/concepts` for programmatic access
+
+Configure the bundle path and LLM settings in `src/Compendium.Web/appsettings.json`.
+
+### CLI
+
+Start a terminal chat session with the system agent:
+
+```bash
+# If you added bin/cli/ to your PATH:
+compendium chat --bundle catalog/sample
+
+# Or use the full path:
+./bin/cli/Compendium.Cli chat --bundle catalog/sample
 ```
 
 By default the session is read-only: the agent can only look things up
 (`ListConcepts`, `ReadConcept`, `SearchConcepts`). Pass `--allow-write` to
 also give it curation tools for that session:
 
-```
-dotnet run --project src/Compendium.Cli -- chat --bundle catalog/sample --allow-write
+```bash
+compendium chat --bundle catalog/sample --allow-write
 ```
 
 - `CreateConcept` — mint a new concept.
@@ -132,8 +236,8 @@ aware: what counts as "one concept" depends on what kind of content the
 source file actually holds — a whole document, a row, a message, a diagram
 page, or a modeling element.
 
-```
-dotnet run --project src/Compendium.Cli -- ingest --source <file-or-dir> --bundle <bundlePath> [--type <ConceptType>]
+```bash
+compendium ingest --source <file-or-dir> --bundle <bundlePath> [--type <ConceptType>]
 ```
 
 - `--source` — a single file, or a directory walked recursively.
