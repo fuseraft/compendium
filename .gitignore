@@ -12,6 +12,11 @@ obj/
 *.user
 *.suo
 
+# Test results
+*.trx
+TestResults/
+artifacts/
+
 # Node
 node_modules/
 npm-debug.log*
