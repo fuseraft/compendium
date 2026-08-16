@@ -1,6 +1,7 @@
 @page "/review"
 @rendermode InteractiveServer
 @using Compendium.Okf
+@using Markdig
 @inject Services.BundleService BundleService
 @inject NavigationManager Navigation
 
@@ -55,7 +56,9 @@
                     </div>
                     <div class="card-body">
                         <p class="text-muted mb-2"><strong>ID:</strong> @concept.Id</p>
-                        <p class="mb-3">@concept.Description</p>
+                        <div class="mb-3 markdown-content">
+                            @((MarkupString)RenderMarkdown(concept.Description))
+                        </div>
 
                         @if (concept.Frontmatter.TryGetValue("tags", out var tagsObj) && tagsObj is System.Collections.IEnumerable tags)
                         {
@@ -78,8 +81,8 @@
 
                         <details class="mb-3">
                             <summary class="btn btn-sm btn-outline-secondary">Preview Content</summary>
-                            <div class="mt-2 p-3 bg-light rounded">
-                                <pre style="white-space: pre-wrap; font-size: 0.85rem;">@concept.Body.Substring(0, Math.Min(500, concept.Body.Length))@(concept.Body.Length > 500 ? "..." : "")</pre>
+                            <div class="mt-2 p-3 bg-light rounded markdown-content">
+                                @((MarkupString)RenderMarkdown(concept.Body.Substring(0, Math.Min(1000, concept.Body.Length)) + (concept.Body.Length > 1000 ? "\n\n..." : "")))
                             </div>
                         </details>
 
@@ -232,5 +235,13 @@
     private void ViewConcept(string conceptId)
     {
         Navigation.NavigateTo($"/concept/{conceptId}");
+    }
+
+    private string RenderMarkdown(string markdown)
+    {
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+        return Markdig.Markdown.ToHtml(markdown, pipeline);
     }
 }

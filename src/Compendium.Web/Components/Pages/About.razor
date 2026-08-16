@@ -1,0 +1,179 @@
+@page "/about"
+
+<PageTitle>About - Compendium</PageTitle>
+
+<div class="container mt-4">
+    <h1>About Compendium</h1>
+    <p class="lead">An OKF-first knowledge catalog for enterprise knowledge</p>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">What is Compendium?</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Compendium helps enterprise architects connect AI agents to the documents their
+                        organization already has — scattered across SharePoint sites, Confluence spaces,
+                        wikis, and shared drives — and turn them into a living, agent-curated map of
+                        the business.
+                    </p>
+                    <p>
+                        Most enterprise knowledge already exists, written for humans skimming a page.
+                        Compendium's job is to turn that sprawl into a single, coherent knowledge catalog:
+                        a directory of interlinked concepts describing the enterprise's architecture,
+                        systems, business processes, and integrations.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Open Knowledge Format (OKF)</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Compendium is <strong>OKF-first</strong>: every concept it produces is a plain
+                        markdown file with YAML frontmatter, conforming to the
+                        <a href="https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md" target="_blank">
+                            Open Knowledge Format
+                        </a>.
+                    </p>
+                    <p>This means the catalog is:</p>
+                    <ul>
+                        <li><strong>Readable without Compendium</strong> — Browse in Obsidian, a static file server, or hand to any LLM as context</li>
+                        <li><strong>Version-controlled</strong> — Lives in git with diffs, blame, and pull requests</li>
+                        <li><strong>Portable</strong> — No proprietary store between you and your metadata</li>
+                        <li><strong>Trustable at scale</strong> — Provenance, trust, and lifecycle fields let an agent-maintained corpus stay honest</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Key Features</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Connectors</h6>
+                    <p>Connect to existing knowledge sources:</p>
+                    <ul>
+                        <li>SharePoint sites</li>
+                        <li>Confluence spaces</li>
+                        <li>Markdown wikis</li>
+                        <li>Local file systems</li>
+                        <li>Git repositories</li>
+                    </ul>
+
+                    <h6 class="mt-3">Supported Formats</h6>
+                    <p>Ingest from 14+ file formats:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Documents: .txt, .md, .pdf, .docx</li>
+                                <li>Data: .json, .xml, .csv, .xlsx</li>
+                                <li>Email: .eml, .msg, .ost</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Diagrams: .drawio, .vsdx</li>
+                                <li>Architecture: .archimate</li>
+                                <li>Data Maps: Excel/CSV lineage tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-3">AI Agent</h6>
+                    <ul>
+                        <li><strong>Curate</strong> — Ingest documents, create concepts, link relationships, flag stale knowledge</li>
+                        <li><strong>Answer</strong> — Field questions grounded in the catalog with traceable sources</li>
+                        <li><strong>Search</strong> — Find concepts across the entire knowledge base</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Data Map Support</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Compendium includes specialized support for <strong>data lineage tracking</strong>
+                        through data maps. Document field-level flows from source systems to destinations:
+                    </p>
+                    <ul>
+                        <li>Automatic detection of data map file format</li>
+                        <li>Groups field mappings by integration name</li>
+                        <li>Tracks source and destination systems</li>
+                        <li>Categorizes destination types (Database, File, Email, API, etc.)</li>
+                        <li>Preserves transformation logic and business rules</li>
+                        <li>Enables graph-based lineage queries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Version</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="mb-0">
+                        <dt>Version:</dt>
+                        <dd>0.1.0-alpha</dd>
+
+                        <dt>Status:</dt>
+                        <dd><span class="badge bg-warning">Early Preview</span></dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="https://github.com/fuseraft/compendium" target="_blank" class="btn btn-outline-primary btn-sm">
+                            📁 GitHub Repository
+                        </a>
+                        <a href="https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            📖 OKF Specification
+                        </a>
+                        <a href="/docs/DataMaps.md" class="btn btn-outline-info btn-sm">
+                            📊 Data Maps Documentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Getting Started</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li><a href="/load-bundle">Load a bundle</a></li>
+                        <li><a href="/settings">Configure LLM</a></li>
+                        <li><a href="/chat">Chat with the agent</a></li>
+                        <li><a href="/ingest">Ingest documents</a></li>
+                        <li><a href="/review">Review drafts</a></li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">License</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-0">
+                        Compendium is open source software.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

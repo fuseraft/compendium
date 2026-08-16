@@ -3,15 +3,30 @@
 @using Compendium.Agent
 @using Microsoft.Extensions.AI
 @using Markdig
+@using Microsoft.JSInterop
 @inject Services.BundleService BundleService
 @inject Services.LlmConfigService LlmConfigService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Chat - Compendium</PageTitle>
 
 <div class="container-fluid h-100 d-flex flex-column">
     <div class="row mt-3">
         <div class="col">
-            <h1>Chat with Compendium Agent</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Chat with Compendium Agent</h1>
+                @if (messages.Count > 0)
+                {
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary btn-sm" @onclick="SaveTranscript" title="Save transcript to file">
+                            <span>💾 Save Transcript</span>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="ClearChat" title="Clear chat history">
+                            <span>🗑️ Clear</span>
+                        </button>
+                    </div>
+                }
+            </div>
         </div>
     </div>
 
@@ -59,18 +74,27 @@
                         @foreach (var msg in messages)
                         {
                             <div class="mb-3 @(msg.Role == "user" ? "text-end" : "")">
-                                <div class="d-inline-block p-3 rounded @(msg.Role == "user" ? "bg-primary text-white" : "bg-light") @(msg.Role != "user" ? "markdown-content" : "")"
-                                     style="max-width: 80%;">
-                                    <strong>@(msg.Role == "user" ? "You" : "Agent"):</strong>
-                                    <div class="mt-1">
-                                        @if (msg.Role == "user")
-                                        {
-                                            @msg.Text
-                                        }
-                                        else
-                                        {
-                                            @((MarkupString)RenderMarkdown(msg.Text))
-                                        }
+                                <div class="d-inline-block text-start" style="max-width: 80%;">
+                                    <div class="p-3 rounded @(msg.Role == "user" ? "bg-primary text-white" : "bg-light") @(msg.Role != "user" ? "markdown-content" : "")">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <strong>@(msg.Role == "user" ? "You" : "Agent"):</strong>
+                                            <button class="btn btn-sm @(msg.Role == "user" ? "btn-outline-light" : "btn-outline-secondary") ms-2"
+                                                    style="padding: 0.1rem 0.4rem; font-size: 0.75rem;"
+                                                    @onclick="() => CopyMessage(msg.Text)"
+                                                    title="Copy message">
+                                                📋
+                                            </button>
+                                        </div>
+                                        <div class="mt-1">
+                                            @if (msg.Role == "user")
+                                            {
+                                                @msg.Text
+                                            }
+                                            else
+                                            {
+                                                @((MarkupString)RenderMarkdown(msg.Text))
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -184,6 +208,56 @@
             .UseAdvancedExtensions()
             .Build();
         return Markdig.Markdown.ToHtml(markdown, pipeline);
+    }
+
+    private async Task CopyMessage(string text)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+        }
+        catch (Exception)
+        {
+            // Clipboard API might not be available in all contexts
+        }
+    }
+
+    private async Task SaveTranscript()
+    {
+        var transcript = new System.Text.StringBuilder();
+        transcript.AppendLine("# Compendium Chat Transcript");
+        transcript.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        transcript.AppendLine($"Bundle: {BundleService.BundlePath}");
+        transcript.AppendLine();
+        transcript.AppendLine("---");
+        transcript.AppendLine();
+
+        foreach (var msg in messages)
+        {
+            transcript.AppendLine($"## {(msg.Role == "user" ? "You" : "Agent")}");
+            transcript.AppendLine();
+            transcript.AppendLine(msg.Text);
+            transcript.AppendLine();
+        }
+
+        var content = transcript.ToString();
+        var fileName = $"chat-transcript-{DateTime.Now:yyyyMMdd-HHmmss}.md";
+
+        // Use JavaScript to trigger download
+        await JSRuntime.InvokeVoidAsync("downloadFile", fileName, content);
+    }
+
+    private async Task ClearChat()
+    {
+        messages.Clear();
+
+        // Reset the agent session to clear conversation history
+        if (agent != null)
+        {
+            session = await agent.CreateSessionAsync();
+        }
+
+        StateHasChanged();
     }
 
     private record ChatMessage(string Role, string Text);

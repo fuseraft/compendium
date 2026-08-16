@@ -88,8 +88,9 @@
                                 <select class="form-select"
                                         id="conceptType"
                                         @bind="conceptType"
+                                        @bind:after="OnConceptTypeChanged"
                                         disabled="@isProcessing">
-                                    @if (!string.IsNullOrEmpty(customConceptType))
+                                    @if (!string.IsNullOrEmpty(customConceptType) && !existingConceptTypes.Contains(customConceptType))
                                     {
                                         <option value="@customConceptType">@customConceptType</option>
                                     }
@@ -363,11 +364,28 @@
         existingConceptTypes = BundleService.GetConceptTypes();
         if (existingConceptTypes.Count == 0)
         {
-            existingConceptTypes = new List<string> { "Document", "System", "Integration", "Process" };
+            existingConceptTypes = new List<string> { "Document", "System", "Integration", "Process", "Data Map" };
+        }
+        else if (!existingConceptTypes.Contains("Data Map"))
+        {
+            existingConceptTypes.Add("Data Map");
         }
         if (!existingConceptTypes.Contains(conceptType))
         {
             conceptType = existingConceptTypes.FirstOrDefault() ?? "Document";
+        }
+    }
+
+    private void OnConceptTypeChanged()
+    {
+        if (conceptType == "__custom__")
+        {
+            showCustomTypeInput = true;
+            customConceptType = "";
+        }
+        else
+        {
+            showCustomTypeInput = false;
         }
     }
 
@@ -390,13 +408,7 @@
         errorMessage = null;
         ingestionResult = null;
 
-        // Watch for custom type selection
         if (conceptType == "__custom__")
-        {
-            showCustomTypeInput = true;
-            customConceptType = "";
-        }
-        else
         {
             showCustomTypeInput = false;
         }

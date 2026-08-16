@@ -42,3 +42,5 @@ Thumbs.db
 
 # Working/scratch OKF bundles not meant for the public repo
 catalog/intcat/
+catalog/datamaps/
+datamaps/
