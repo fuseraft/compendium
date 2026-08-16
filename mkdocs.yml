@@ -1,0 +1,111 @@
+site_name: Compendium
+site_description: An OKF-first knowledge catalog for enterprise architecture
+site_author: Compendium Contributors
+site_url: https://fuseraft.github.io/compendium
+
+repo_name: fuseraft/compendium
+repo_url: https://github.com/fuseraft/compendium
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/fuseraft/compendium
+  version:
+    provider: mike
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      enable_creation_date: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quick Start: getting-started/quickstart.md
+      - Configuration: getting-started/configuration.md
+  - User Guide:
+      - Concepts: guide/concepts.md
+      - Ingestion: guide/ingestion.md
+      - Data Maps: guide/data-maps.md
+      - Chat Interface: guide/chat.md
+      - Web UI: guide/web-ui.md
+      - CLI: guide/cli.md
+  - Features:
+      - OKF Format: features/okf.md
+      - Connectors: features/connectors.md
+      - Data Lineage: features/data-lineage.md
+      - AI Agent: features/agent.md
+  - Development:
+      - Building: development/building.md
+      - Architecture: development/architecture.md
+      - Contributing: development/contributing.md
+  - Reference:
+      - Supported Formats: reference/formats.md
+      - API: reference/api.md

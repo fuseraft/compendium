@@ -44,3 +44,7 @@ Thumbs.db
 catalog/intcat/
 catalog/datamaps/
 datamaps/
+
+# MkDocs
+site/
+.cache/
