@@ -1660,7 +1660,7 @@
 </span></code></pre></div>
 <h3 id="windows_1">Windows<a class="headerlink" href="#windows_1" title="Permanent link">&para;</a></h3>
 <div class="language-powershell highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c"># Download and extract</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="s2">&quot;https://github.com/fuseraft/compendium/releases/latest/download/compendium-cli-&lt;version&gt;-win-x64.zip&quot;</span> <span class="n">-OutFile</span> <span class="n">compendium-cli</span><span class="p">.</span><span class="n">zip</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">Invoke-WebRequest</span> <span class="n">-Uri</span> <span class="s2">"https://github.com/fuseraft/compendium/releases/latest/download/compendium-cli-&lt;version&gt;-win-x64.zip"</span> <span class="n">-OutFile</span> <span class="n">compendium-cli</span><span class="p">.</span><span class="n">zip</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="nb">Expand-Archive</span> <span class="n">compendium-cli</span><span class="p">.</span><span class="n">zip</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c"># Run</span>
@@ -1669,7 +1669,7 @@
 <h2 id="add-to-path-optional">Add to PATH (Optional)<a class="headerlink" href="#add-to-path-optional" title="Permanent link">&para;</a></h2>
 <h3 id="linuxmacos_2">Linux/macOS<a class="headerlink" href="#linuxmacos_2" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Add to ~/.bashrc or ~/.zshrc</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">:/path/to/compendium/bin/cli&quot;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">:/path/to/compendium/bin/cli"</span>
 </span></code></pre></div>
 <h3 id="windows_2">Windows<a class="headerlink" href="#windows_2" title="Permanent link">&para;</a></h3>
 <p>Add <code>C:\path\to\compendium\bin\cli</code> to your system PATH environment variable.</p>
@@ -1790,6 +1790,8 @@
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
       
     
   </body>

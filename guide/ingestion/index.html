@@ -1879,10 +1879,10 @@
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>sharepoint-export/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span>Document
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Ingest data maps</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>datamaps/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Data Map&quot;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>datamaps/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Ingest architecture diagrams</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>diagrams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Architecture Diagram&quot;</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>diagrams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Architecture Diagram"</span>
 </span></code></pre></div>
 <h2 id="supported-file-formats">Supported File Formats<a class="headerlink" href="#supported-file-formats" title="Permanent link">&para;</a></h2>
 <h3 id="documents">Documents<a class="headerlink" href="#documents" title="Permanent link">&para;</a></h3>
@@ -2036,8 +2036,8 @@
 <p>Every ingested concept receives consistent OKF frontmatter:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nn">---</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Document</span><span class="w">                              </span><span class="c1"># From --type parameter</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Architecture</span><span class="nv"> </span><span class="s">Overview&quot;</span><span class="w">              </span><span class="c1"># Extracted from content</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;High-level</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">design...&quot;</span><span class="w">  </span><span class="c1"># First sentence or 240 chars</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Architecture</span><span class="nv"> </span><span class="s">Overview"</span><span class="w">              </span><span class="c1"># Extracted from content</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">"High-level</span><span class="nv"> </span><span class="s">system</span><span class="nv"> </span><span class="s">design..."</span><span class="w">  </span><span class="c1"># First sentence or 240 chars</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">imported</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">pdf</span><span class="p p-Indicator">]</span><span class="w">                       </span><span class="c1"># Format tag added automatically</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">draft</span><span class="w">                               </span><span class="c1"># Always starts as draft</span>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nt">generated</span><span class="p">:</span>
@@ -2046,7 +2046,7 @@
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="nt">sources</span><span class="p">:</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">original-file</span>
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/references/architecture.pdf</span><span class="w">   </span><span class="c1"># Mirrored to references/</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;architecture.pdf&quot;</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"architecture.pdf"</span>
 </span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="nn">---</span>
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
 </span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="c1"># Content</span>
@@ -2078,10 +2078,10 @@
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>├── documents/              # --type Document
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>│   ├── architecture.md
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>│   └── design-spec.md
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├── data-maps/              # --type &quot;Data Map&quot;
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>├── data-maps/              # --type "Data Map"
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>│   ├── projectstocalero.md
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>│   └── cprights.md
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>├── architecture-diagrams/  # --type &quot;Architecture Diagram&quot;
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>├── architecture-diagrams/  # --type "Architecture Diagram"
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>│   ├── system-overview.md
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│   └── network-topology.md
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>└── references/             # Original files preserved
@@ -2104,13 +2104,13 @@
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>sharepoint-export/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span>Document
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Architecture diagrams</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>diagrams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Architecture Diagram&quot;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>diagrams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Architecture Diagram"</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Email archives</span>
 </span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>emails.ost<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span>Email
 </span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="c1"># Data lineage maps</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>datamaps/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Data Map&quot;</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>datamaps/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span>
 </span></code></pre></div>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <p>The ingestion process is resilient:</p>
@@ -2137,9 +2137,9 @@
 <h2 id="advanced-options">Advanced Options<a class="headerlink" href="#advanced-options" title="Permanent link">&para;</a></h2>
 <h3 id="custom-concept-types">Custom Concept Types<a class="headerlink" href="#custom-concept-types" title="Permanent link">&para;</a></h3>
 <p>Define your own types based on domain needs:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>apis/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;API Endpoint&quot;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>reports/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Business Report&quot;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>teams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">&quot;Team&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>apis/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"API Endpoint"</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>reports/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Business Report"</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>teams/<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Team"</span>
 </span></code></pre></div>
 <h3 id="incremental-updates">Incremental Updates<a class="headerlink" href="#incremental-updates" title="Permanent link">&para;</a></h3>
 <p>Re-run ingestion on the same source to update concepts:</p>
@@ -2273,6 +2273,8 @@
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
       
     
   </body>
