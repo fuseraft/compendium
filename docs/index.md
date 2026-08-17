@@ -104,10 +104,6 @@ graph LR
     CN --> EC
     EC --> BN
     BN --> AG
-    
-    style Sources fill:#e1f5ff
-    style Compendium fill:#fff4e1
-    style Consumers fill:#e8f5e9
 ```
 
 ## Use Cases
