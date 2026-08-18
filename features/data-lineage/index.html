@@ -2136,18 +2136,14 @@
 <p>Compendium tracks field-level data lineage through data maps, enabling you to trace how data flows from source systems through transformations to destinations. This is essential for data governance, impact analysis, and regulatory compliance.</p>
 <h2 id="what-is-data-lineage">What is Data Lineage?<a class="headerlink" href="#what-is-data-lineage" title="Permanent link">&para;</a></h2>
 <p>Data lineage documents the journey of data through an organization's systems:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Source System          Integration/ETL         Destination System
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>┌──────────────┐      ┌────────────────┐      ┌──────────────┐
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│ ODS Database │      │ ProjectsToCalero│      │ CSV File     │
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│              │ ───▶ │                │ ───▶ │              │
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│ Project.ID   │      │ Transform:     │      │ ProjectId    │
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│ Project.Name │      │ - Rename       │      │ Name         │
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>└──────────────┘      │ - Format       │      └──────────────┘
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                      └────────────────┘
-</span></code></pre></div>
+<pre class="mermaid"><code>graph LR
+    SRC["CoreDB&lt;br/&gt;Project.ID&lt;br/&gt;Project.Name"]
+    ETL["ProjectSync&lt;br/&gt;Transform:&lt;br/&gt;- Rename&lt;br/&gt;- Format"]
+    DST["CSV File&lt;br/&gt;ProjectId&lt;br/&gt;Name"]
+    SRC --&gt; ETL --&gt; DST</code></pre>
 <p>Compendium captures this as structured OKF concepts, enabling queries like:</p>
 <ul>
-<li>"Which integrations read from the ODS database?"</li>
+<li>"Which integrations read from the CoreDB database?"</li>
 <li>"What happens to customer email addresses?"</li>
 <li>"Which reports use the SalesAmount field?"</li>
 <li>"What's the impact if we change the Customer table schema?"</li>
@@ -2180,7 +2176,7 @@
 <tr>
 <td>SalesReport</td>
 <td>2-Field Mapping</td>
-<td>ODS</td>
+<td>CoreDB</td>
 <td>Sales</td>
 <td>SalesAmount</td>
 <td>ReportDB</td>
@@ -2191,7 +2187,7 @@
 <tr>
 <td>SalesReport</td>
 <td>2-Field Mapping</td>
-<td>ODS</td>
+<td>CoreDB</td>
 <td>Sales</td>
 <td>OrderDate</td>
 <td>ReportDB</td>
@@ -2212,40 +2208,40 @@
 </ol>
 <h3 id="generated-metadata">Generated Metadata<a class="headerlink" href="#generated-metadata" title="Permanent link">&para;</a></h3>
 <p>Each data map concept includes structured metadata:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Data Map</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"SalesReport"</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nt">source_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"ODS"</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nt">destination_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"ReportDB"</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nt">destination_types</span><span class="p">:</span><span class="w"> </span><span class="s">"Database"</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nt">field_count</span><span class="p">:</span><span class="w"> </span><span class="s">"23"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Data Map</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"SalesReport"</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nt">source_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"CoreDB"</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nt">destination_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"ReportDB"</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nt">destination_types</span><span class="p">:</span><span class="w"> </span><span class="s">"Database"</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nt">field_count</span><span class="p">:</span><span class="w"> </span><span class="s">"23"</span>
 </span></code></pre></div>
 <p>This enables precise filtering and graph queries.</p>
 <h2 id="querying-lineage">Querying Lineage<a class="headerlink" href="#querying-lineage" title="Permanent link">&para;</a></h2>
 <h3 id="via-agent">Via Agent<a class="headerlink" href="#via-agent" title="Permanent link">&para;</a></h3>
 <p>Ask natural language questions:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Which integrations read from the ODS database?
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Show me all data flows that write to files
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>What transformations are applied to the SalesAmount field?
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Trace the lineage of customer email addresses
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Which systems feed data into the reporting database?
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Which integrations read from the CoreDB database?
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Show me all data flows that write to files
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>What transformations are applied to the SalesAmount field?
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Trace the lineage of customer email addresses
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Which systems feed data into the reporting database?
 </span></code></pre></div>
 <h3 id="via-cli">Via CLI<a class="headerlink" href="#via-cli" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Find integrations by source system</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"source_systems:ODS"</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Find file outputs</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>compendium<span class="w"> </span>list<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span>jq<span class="w"> </span><span class="s1">'.[] | select(.destination_types | contains("File"))'</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1"># Export lineage to CSV</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>compendium<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>--output<span class="w"> </span>lineage.csv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Find integrations by source system</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"source_systems:CoreDB"</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Find file outputs</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>compendium<span class="w"> </span>list<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span>jq<span class="w"> </span><span class="s1">'.[] | select(.destination_types | contains("File"))'</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="c1"># Export lineage to CSV</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>compendium<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>--output<span class="w"> </span>lineage.csv
 </span></code></pre></div>
 <h3 id="via-api">Via API<a class="headerlink" href="#via-api" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Get all data maps</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>curl<span class="w"> </span>http://localhost:5050/api/concepts?type<span class="o">=</span>Data%20Map
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Search by source system</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>curl<span class="w"> </span><span class="s2">"http://localhost:5050/api/concepts/search?q=source_systems:ODS"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Get all data maps</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>http://localhost:5050/api/concepts?type<span class="o">=</span>Data%20Map
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Search by source system</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>curl<span class="w"> </span><span class="s2">"http://localhost:5050/api/concepts/search?q=source_systems:CoreDB"</span>
 </span></code></pre></div>
 <h2 id="lineage-visualization">Lineage Visualization<a class="headerlink" href="#lineage-visualization" title="Permanent link">&para;</a></h2>
 <h3 id="concept-view">Concept View<a class="headerlink" href="#concept-view" title="Permanent link">&para;</a></h3>
@@ -2257,67 +2253,67 @@
 <li><strong>Destination Systems</strong> — Categorized destinations</li>
 </ul>
 <p>Example:</p>
-<div class="language-markdown highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="gh"># SalesReport</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="gu">## Overview</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Generates daily sales report from ODS database to ReportDB.
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="gu">## Field Mappings</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>| Source | Destination | Details |
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>|--------|-------------|---------|
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>| ODS.dbo.Sales.SalesAmount | ReportDB.dbo.DailySales.Amount | Rounded to 2 decimals |
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>| ODS.dbo.Sales.OrderDate | ReportDB.dbo.DailySales.Date | Converted to UTC |
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="gu">## Source Systems</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="k">-</span><span class="w"> </span>ODS
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="gu">## Destination Systems</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="k">-</span><span class="w"> </span>ReportDB (Database)
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="gh"># SalesReport</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="gu">## Overview</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>Generates daily sales report from CoreDB database to ReportDB.
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="gu">## Field Mappings</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>| Source | Destination | Details |
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>|--------|-------------|---------|
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>| CoreDB.dbo.Sales.SalesAmount | ReportDB.dbo.DailySales.Amount | Rounded to 2 decimals |
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>| CoreDB.dbo.Sales.OrderDate | ReportDB.dbo.DailySales.Date | Converted to UTC |
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="gu">## Source Systems</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="k">-</span><span class="w"> </span>CoreDB
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="gu">## Destination Systems</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="k">-</span><span class="w"> </span>ReportDB (Database)
 </span></code></pre></div>
 <h3 id="graph-visualization-future">Graph Visualization (Future)<a class="headerlink" href="#graph-visualization-future" title="Permanent link">&para;</a></h3>
 <p>Planned feature: Generate visual lineage diagrams showing data flows across systems.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>compendium<span class="w"> </span>lineage<span class="w"> </span>graph<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--output<span class="w"> </span>lineage.svg
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>compendium<span class="w"> </span>lineage<span class="w"> </span>graph<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--output<span class="w"> </span>lineage.svg
 </span></code></pre></div>
 <p>Will produce a directed graph:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>ODS ──▶ ProjectsToCalero ──▶ CSV File
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>ODS ──▶ SalesReport ──▶ ReportDB ──▶ PowerBI
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Warehouse ──▶ InventorySync ──▶ SFTP
-</span></code></pre></div>
+<pre class="mermaid"><code>graph LR
+    CoreDB --&gt; ProjectSync --&gt; CSV[CSV File]
+    CoreDB --&gt; SalesReport --&gt; ReportDB --&gt; PowerBI
+    Warehouse --&gt; InventorySync --&gt; SFTP</code></pre>
 <h2 id="use-cases">Use Cases<a class="headerlink" href="#use-cases" title="Permanent link">&para;</a></h2>
 <h3 id="1-impact-analysis">1. Impact Analysis<a class="headerlink" href="#1-impact-analysis" title="Permanent link">&para;</a></h3>
 <p><strong>Question:</strong> "If we change the Customer table schema, what breaks?"</p>
 <p><strong>Approach:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Find all integrations reading from Customer table</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"SRC Table:Customer"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Find all integrations reading from Customer table</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"SRC Table:Customer"</span>
 </span></code></pre></div>
 <p><strong>Result:</strong> List of impacted integrations and downstream systems.</p>
 <h3 id="2-data-governance">2. Data Governance<a class="headerlink" href="#2-data-governance" title="Permanent link">&para;</a></h3>
 <p><strong>Question:</strong> "Where does customer PII flow in our systems?"</p>
 <p><strong>Approach:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Search for PII field names</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"Email OR SSN OR Phone"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Search for PII field names</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"Email OR SSN OR Phone"</span>
 </span></code></pre></div>
 <p><strong>Result:</strong> Full lineage of sensitive data across integrations.</p>
 <h3 id="3-compliance-reporting">3. Compliance Reporting<a class="headerlink" href="#3-compliance-reporting" title="Permanent link">&para;</a></h3>
 <p><strong>Question:</strong> "Document all data flows for GDPR audit."</p>
 <p><strong>Approach:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Export all data maps to CSV</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>compendium<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>--output<span class="w"> </span>gdpr-lineage.csv
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Export all data maps to CSV</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>compendium<span class="w"> </span><span class="nb">export</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span><span class="w"> </span>--format<span class="w"> </span>csv<span class="w"> </span>--output<span class="w"> </span>gdpr-lineage.csv
 </span></code></pre></div>
 <p><strong>Result:</strong> Comprehensive lineage report for auditors.</p>
 <h3 id="4-system-decommissioning">4. System Decommissioning<a class="headerlink" href="#4-system-decommissioning" title="Permanent link">&para;</a></h3>
 <p><strong>Question:</strong> "Can we safely decommission the Legacy CRM database?"</p>
 <p><strong>Approach:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Check if anything still reads from it</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"source_systems:LegacyCRM"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Check if anything still reads from it</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>compendium<span class="w"> </span>search<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--query<span class="w"> </span><span class="s2">"source_systems:LegacyCRM"</span>
 </span></code></pre></div>
 <p><strong>Result:</strong> List of dependencies to migrate before decommissioning.</p>
 <h3 id="5-data-quality-investigation">5. Data Quality Investigation<a class="headerlink" href="#5-data-quality-investigation" title="Permanent link">&para;</a></h3>
 <p><strong>Question:</strong> "Why is the sales report showing incorrect totals?"</p>
 <p><strong>Approach:</strong></p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Read the SalesReport data map</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>compendium<span class="w"> </span><span class="nb">read</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--id<span class="w"> </span>data-maps/salesreport
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Read the SalesReport data map</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>compendium<span class="w"> </span><span class="nb">read</span><span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--id<span class="w"> </span>data-maps/salesreport
 </span></code></pre></div>
 <p><strong>Result:</strong> See transformation logic and identify potential issues.</p>
 <h2 id="lineage-chaining-future-feature">Lineage Chaining (Future Feature)<a class="headerlink" href="#lineage-chaining-future-feature" title="Permanent link">&para;</a></h2>
@@ -2329,17 +2325,17 @@
 <li>Enable multi-hop lineage queries</li>
 </ol>
 <p>Example:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>ODS ─▶ ProjectsToCalero ─▶ CSV ─▶ S3Upload ─▶ S3 Bucket ─▶ DataWarehouse ─▶ PowerBI
-</span></code></pre></div>
-<p>Query: "Trace ODS.Project.Name to PowerBI"</p>
+<pre class="mermaid"><code>graph LR
+    CoreDB --&gt; ProjectSync --&gt; CSV --&gt; S3Upload --&gt; S3["S3 Bucket"] --&gt; DataWarehouse --&gt; PowerBI</code></pre>
+<p>Query: "Trace CoreDB.Project.Name to PowerBI"</p>
 <p>Result: Full chain showing every transformation along the way.</p>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="1-consistent-system-names">1. Consistent System Names<a class="headerlink" href="#1-consistent-system-names" title="Permanent link">&para;</a></h3>
 <p>Use the same names for systems across all data maps:</p>
 <p>✅ <strong>Good:</strong>
-- Always use "ODS" (not "ODS DB", "ODS_PROD", "Operational Data Store")</p>
+- Always use "CoreDB" (not "CoreDB DB", "CoreDB_PROD", "Operational Data Store")</p>
 <p>❌ <strong>Bad:</strong>
-- "ODS" in one map, "ODS_Database" in another, "Operational Store" in a third</p>
+- "CoreDB" in one map, "CoreDB_Database" in another, "Operational Store" in a third</p>
 <h3 id="2-document-transformations">2. Document Transformations<a class="headerlink" href="#2-document-transformations" title="Permanent link">&para;</a></h3>
 <p>Capture business logic in the Details column:</p>
 <p>✅ <strong>Good:</strong>
@@ -2353,9 +2349,9 @@
 - (empty)</p>
 <h3 id="3-include-high-level-overviews">3. Include High-Level Overviews<a class="headerlink" href="#3-include-high-level-overviews" title="Permanent link">&para;</a></h3>
 <p>Use <code>Record Type: 1-High-Level Overview</code> rows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>Int Name: SalesReport
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Record Type: 1-High-Level Overview
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Details: Generates daily sales report from ODS to ReportDB, runs at 2am, includes previous day's sales
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>Int Name: SalesReport
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Record Type: 1-High-Level Overview
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Details: Generates daily sales report from CoreDB to ReportDB, runs at 2am, includes previous day's sales
 </span></code></pre></div>
 <p>This context is valuable when reviewing lineage.</p>
 <h3 id="4-track-non-database-destinations">4. Track Non-Database Destinations<a class="headerlink" href="#4-track-non-database-destinations" title="Permanent link">&para;</a></h3>
@@ -2369,24 +2365,24 @@
 - DST Column: (empty)</p>
 <h3 id="5-version-control-data-maps">5. Version Control Data Maps<a class="headerlink" href="#5-version-control-data-maps" title="Permanent link">&para;</a></h3>
 <p>Keep data map source files in git alongside the bundle:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>my-catalog/
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>├── data-maps/          # Generated concepts
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>│   ├── salesreport.md
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>│   └── inventorysync.md
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>├── references/         # Original data map files
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>│   ├── lineage-v1.xlsx
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>│   └── lineage-v2.xlsx
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>└── source/             # Version-controlled source files
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>    └── data-lineage.xlsx
+<div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>my-catalog/
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>├── data-maps/          # Generated concepts
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>│   ├── salesreport.md
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>│   └── inventorysync.md
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>├── references/         # Original data map files
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>│   ├── lineage-v1.xlsx
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>│   └── lineage-v2.xlsx
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>└── source/             # Version-controlled source files
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    └── data-lineage.xlsx
 </span></code></pre></div>
 <p>Commit updates:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>git<span class="w"> </span>add<span class="w"> </span>source/data-lineage.xlsx
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Update SalesReport lineage: add TaxAmount field"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>git<span class="w"> </span>add<span class="w"> </span>source/data-lineage.xlsx
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Update SalesReport lineage: add TaxAmount field"</span>
 </span></code></pre></div>
 <h3 id="6-regular-sync">6. Regular Sync<a class="headerlink" href="#6-regular-sync" title="Permanent link">&para;</a></h3>
 <p>Re-ingest data maps regularly to keep lineage current:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Weekly cron job</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="m">0</span><span class="w"> </span><span class="m">3</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="m">1</span><span class="w"> </span>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>source/data-lineage.xlsx<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Weekly cron job</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="m">0</span><span class="w"> </span><span class="m">3</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span><span class="m">1</span><span class="w"> </span>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span>source/data-lineage.xlsx<span class="w"> </span>--bundle<span class="w"> </span>my-catalog<span class="w"> </span>--type<span class="w"> </span><span class="s2">"Data Map"</span>
 </span></code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="data-map-not-detected">Data Map Not Detected<a class="headerlink" href="#data-map-not-detected" title="Permanent link">&para;</a></h3>
@@ -2444,7 +2440,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 16, 2026 22:49:34 UTC">August 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 03:46:46 UTC">August 18, 2026</span>
   </span>
 
     
