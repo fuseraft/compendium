@@ -502,7 +502,7 @@ Agent tools controlled by `--allow-write` flag. No concept-level permissions (ye
 ### Secrets Management
 
 API keys stored in:
-- `~/.compendium/config.json` (chmod 600)
+- `.env` at the repo root (written by `compendium init`)
 - Environment variables
 - Not in bundles (git-ignored)
 

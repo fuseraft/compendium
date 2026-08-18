@@ -50,6 +50,16 @@ public class CompendiumToolsTests
 
         Assert.Contains("integrations/billing-to-inventory", result);
     }
+
+    [Fact]
+    public void ListConceptTypesReportsNoSpecWhenBundleHasNoConfig()
+    {
+        var tools = LoadTools();
+
+        var result = tools.ListConceptTypes();
+
+        Assert.Contains(".compendium/config.json", result);
+    }
 }
 
 public class CompendiumToolsWriteTests : IDisposable
@@ -109,6 +119,56 @@ public class CompendiumToolsWriteTests : IDisposable
 
         Assert.Contains("Flagged", message);
         Assert.Equal(before, _tools.ListConcepts());
+    }
+
+    [Fact]
+    public void CreateConceptRejectsUnknownTypeWhenBundleConfigIsClosed()
+    {
+        WriteBundleConfig("""{ "types": { "System": { "directory": "systems" } }, "allow_new_types": "closed" }""");
+
+        var result = _tools.CreateConcept("Widget", "Some Widget", "desc", "# Overview");
+
+        Assert.Contains("not a recognized concept type", result);
+        Assert.False(File.Exists(Path.Combine(_bundleRoot, "widgets", "some-widget.md")));
+    }
+
+    [Fact]
+    public void CreateConceptSucceedsAndLogsProposalWhenTypeUnknownAndModeIsPropose()
+    {
+        WriteBundleConfig("""{ "types": { "System": { "directory": "systems" } }, "allow_new_types": "propose" }""");
+
+        var result = _tools.CreateConcept("Widget", "Some Widget", "desc", "# Overview");
+
+        Assert.Contains("Created", result);
+        Assert.True(File.Exists(Path.Combine(_bundleRoot, "widgets", "some-widget.md")));
+
+        var log = File.ReadAllText(Path.Combine(_bundleRoot, "log.md"));
+        Assert.Contains("New type proposed", log);
+    }
+
+    [Fact]
+    public void ListConceptTypesReturnsDeclaredTypesFromConfig()
+    {
+        WriteBundleConfig("""
+            {
+              "types": {
+                "System": { "directory": "systems", "description": "An app or service." }
+              },
+              "allow_new_types": "propose"
+            }
+            """);
+
+        var result = _tools.ListConceptTypes();
+
+        Assert.Contains("System", result);
+        Assert.Contains("An app or service.", result);
+    }
+
+    private void WriteBundleConfig(string json)
+    {
+        var dir = Path.Combine(_bundleRoot, ".compendium");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "config.json"), json);
     }
 
     private static void CopyDirectory(string source, string destination)

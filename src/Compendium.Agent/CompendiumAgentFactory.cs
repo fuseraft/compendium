@@ -51,6 +51,7 @@ public static class CompendiumAgentFactory
         var readTools = new[]
         {
             AIFunctionFactory.Create(tools.ListConcepts),
+            AIFunctionFactory.Create(tools.ListConceptTypes),
             AIFunctionFactory.Create(tools.ReadConcept),
             AIFunctionFactory.Create(tools.SearchConcepts),
             AIFunctionFactory.Create(tools.ReadFile),

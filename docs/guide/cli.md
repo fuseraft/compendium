@@ -1,6 +1,6 @@
 ﻿# CLI Reference
 
-The Compendium CLI provides command-line tools for initializing configuration, ingesting documents, and interacting with the system agent through chat.
+The Compendium CLI provides command-line tools for initializing configuration, creating bundles, ingesting documents, and interacting with the system agent through chat.
 
 ## Installation
 
@@ -8,10 +8,11 @@ See [Installation Guide](../getting-started/installation.md) for build and setup
 
 ## Available Commands
 
-Compendium currently supports three core commands:
+Compendium currently supports four core commands:
 
 ```bash
 compendium init                                              # Configure your model provider
+compendium new <path>                                        # Create a new OKF bundle
 compendium chat --bundle <path>                              # Chat with the Compendium agent
 compendium ingest --source <path> --bundle <path> [--type <Type>]  # Convert source documents into OKF concepts
 ```
@@ -27,32 +28,70 @@ compendium init
 ```
 
 Prompts for:
-- **Base URL** — LLM API endpoint
-- **API Key** — Authentication key
-- **Model** — Model name (fetches available models from provider)
+- **Provider base URL** — the OpenAI-compatible API endpoint
+- **API key** — entered masked; leave blank to keep the existing key when
+  reconfiguring
+- **Model** — a numbered pick-list fetched from the provider's `/models`
+  endpoint, or type a model id directly if that fetch fails
 
-Configuration saved to `~/.compendium/config.json`.
+There's no separate overwrite flag — re-running `init` shows your current
+values as defaults, so it doubles as "reconfigure."
 
-#### Options
-
-```bash
---force, -f         Overwrite existing configuration
-```
+Configuration is saved to a `.env` file at the repo root
+(`LITELLM_BASE_URL`, `LITELLM_API_KEY`, `LITELLM_MODEL`), not a JSON config
+file.
 
 #### Example
 
 ```bash
 $ compendium init
-Base URL: https://api.openai.com/v1
-API Key: sk-...
-Fetching available models...
-Select model:
+Compendium setup — configure your model provider.
+
+Provider base URL: https://api.openai.com/v1
+API key: ****************
+Available models:
   1. gpt-4-turbo-preview
   2. gpt-4
   3. gpt-3.5-turbo
-Choice: 1
+Model (number or id): 1
 
-Configuration saved to ~/.compendium/config.json
+Saved to /home/you/compendium/.env
+Run `dotnet run --project src/Compendium.Cli -- chat` to start.
+```
+
+---
+
+### `new`
+
+Create a new OKF bundle.
+
+```bash
+compendium new <path>
+```
+
+Scaffolds:
+
+- `.compendium/config.json` — a starter spec declaring `System`, `Process`,
+  and `Integration` concept types in `"propose"` mode (see
+  [OKF: Bundle Spec](../features/okf.md#bundle-spec-compendiumconfigjson))
+- `index.md` — a short orientation page
+- `log.md` — the bundle's provenance log
+- `references/` — empty, for source documents you later ingest
+- `systems/example-system.md` — a seed concept showing the expected
+  frontmatter shape; replace or delete it
+
+Fails without writing anything if `<path>` already exists and is not empty.
+
+#### Example
+
+```bash
+$ compendium new my-catalog
+Created bundle at '/home/you/my-catalog'.
+
+Next steps:
+  cat my-catalog/index.md
+  compendium ingest --source <path> --bundle my-catalog   # grow it from source docs
+  compendium chat --bundle my-catalog                     # or start chatting with it
 ```
 
 ---
@@ -73,11 +112,14 @@ compendium ingest --source <path> --bundle <path> [options]
 #### Options
 
 ```bash
---type <string>        Concept type (default: Document)
---recursive, -r        Recurse into subdirectories (default: true)
---overwrite            Overwrite existing concepts
---dry-run              Show what would be ingested without writing
+--type <string>        Concept type recorded in frontmatter, and the name
+                        of the folder concepts are written into (lowercased,
+                        spaces→hyphens, pluralized). Default: Document
 ```
+
+A directory passed to `--source` is always walked recursively; there's no
+`--recursive`, `--overwrite`, or `--dry-run` flag today — re-ingesting the
+same source writes new concept files rather than updating in place.
 
 #### Examples
 
@@ -87,32 +129,24 @@ compendium ingest --source docs/arch.pdf --bundle my-catalog
 
 # Ingest directory with specific type
 compendium ingest --source datamaps/ --bundle my-catalog --type "Data Map"
-
-# Dry run to preview
-compendium ingest --source docs/ --bundle my-catalog --dry-run
-
-# Overwrite existing concepts
-compendium ingest --source docs/ --bundle my-catalog --overwrite
 ```
 
 #### Output
 
 ```
-Scanning source: docs/
-Found: 150 files
-Supported: 142 files
-Skipped: 8 unsupported formats
-
-Processing...
-[=====================================] 100% (142/142)
-
-Results:
-  Written: 139 concepts
-  Updated: 0 concepts
-  Failed: 3 files
-
-See my-catalog/ for generated concepts
+$ compendium ingest --source docs/ --bundle my-catalog
+Processed 150 file(s), wrote 142 concept(s) to my-catalog
+Skipped 5 unsupported file(s):
+  - docs/notes.txt.bak
+  - docs/archive.zip
+  ...
+Failed to ingest 3 file(s):
+  - docs/corrupt.pdf: <error message>
+  ...
 ```
+
+The "Skipped" and "Failed" blocks only print when there's something to
+report.
 
 ---
 
@@ -124,18 +158,19 @@ Start an interactive chat session with the system agent.
 compendium chat --bundle <path> [options]
 ```
 
-#### Required Arguments
+#### Arguments
 
-- `--bundle <path>` — OKF bundle to load
+- `--bundle <path>` — OKF bundle to load. Optional — defaults to the
+  repo's `catalog/sample` bundle if omitted.
 
 #### Options
 
 ```bash
---allow-write          Enable agent curation tools (CreateConcept, UpdateConceptBody, etc.)
---model <name>         Override configured model
---temperature <0-2>    Sampling temperature (default: 0.7)
---max-tokens <int>     Max response tokens (default: 4000)
+--allow-write          Enable agent curation tools (CreateConcept, UpdateConceptBody, AddLink, FlagForReview)
 ```
+
+There's no `--model`, `--temperature`, or `--max-tokens` flag — the model
+comes from `LITELLM_MODEL` in `.env` (set via `compendium init`).
 
 #### Examples
 
@@ -145,47 +180,29 @@ compendium chat --bundle my-catalog
 
 # With write permissions
 compendium chat --bundle my-catalog --allow-write
-
-# Custom model
-compendium chat --bundle my-catalog --model gpt-4-turbo-preview
 ```
 
-#### Interactive Commands
+#### Ending a session
 
-Within a chat session:
-
-```
-/help              Show available commands
-/exit, /quit       Exit session
-/clear             Clear conversation history
-/status            Show loaded bundle and model info
-/write on|off      Toggle write mode
-```
+Type `exit` (case-insensitive), or press Enter on an empty line. There are
+no in-session slash commands (`/help`, `/clear`, etc.) today — every line
+you type that isn't blank or `exit` is sent to the agent as a query.
 
 #### Example Session
 
 ```bash
 $ compendium chat --bundle my-catalog
-Loaded bundle: my-catalog (42 concepts)
-Model: gpt-4-turbo-preview
-Mode: read-only
+Compendium — 4 concept(s) loaded from /home/you/my-catalog
+Read-only session — pass --allow-write to let the agent create or modify concepts.
+Ask a question, or type 'exit' to quit.
 
-> List all systems
-Found 15 system concepts:
-- Order Management System (systems/order-management.md)
-- Payment Gateway (systems/payment-gateway.md)
-- Inventory System (systems/inventory.md)
-...
+> What does the Billing Service do?
+The Billing Service issues invoices, collects payment via the payment
+processor, and is the system of record for whether an order has been paid.
 
-> What does the Order Management System do?
-The Order Management System (OMS) handles customer orders from placement 
-through fulfillment. It integrates with the Payment Gateway for payments
-and the Warehouse Management System for shipping.
+Source: systems/billing-service.md (stable)
 
-Source: systems/order-management.md (stable, verified 2026-08-10)
-
-> /exit
-Goodbye!
+> exit
 ```
 
 !!! note "Additional CLI Commands Planned"
@@ -202,60 +219,41 @@ Goodbye!
 
 ### Config File Location
 
-Default: `~/.compendium/config.json`
-
-Override: `--config <path>` or `COMPENDIUM_CONFIG` environment variable
+`.env` at the repo root (found by walking up from the running executable
+to `Compendium.slnx`). There's no `--config` flag or `COMPENDIUM_CONFIG`
+variable to override the path.
 
 ### Config File Format
 
-```json
-{
-  "baseUrl": "https://api.openai.com/v1",
-  "apiKey": "sk-...",
-  "model": "gpt-4-turbo-preview",
-  "maxTokens": 4000,
-  "temperature": 0.7
-}
+Plain `KEY=value` lines, written by `compendium init`:
+
+```
+LITELLM_BASE_URL=https://api.openai.com/v1
+LITELLM_API_KEY=sk-...
+LITELLM_MODEL=gpt-4-turbo-preview
 ```
 
 ### Environment Variables
 
-Override config file settings:
+The same three variables can be set directly in the environment instead of
+(or to override) `.env`:
 
 ```bash
-export COMPENDIUM_BASE_URL="https://api.openai.com/v1"
-export COMPENDIUM_API_KEY="sk-..."
-export COMPENDIUM_MODEL="gpt-4"
-export COMPENDIUM_MAX_TOKENS="8000"
-export COMPENDIUM_TEMPERATURE="0.5"
+export LITELLM_BASE_URL="https://api.openai.com/v1"
+export LITELLM_API_KEY="sk-..."
+export LITELLM_MODEL="gpt-4"
 ```
 
-Environment variables take precedence over config file.
+`LITELLM_MODEL` falls back to `anthropic.claude-sonnet-5` if unset;
+`LITELLM_BASE_URL` and `LITELLM_API_KEY` are required — `chat` exits with
+an error telling you to run `init` if either is missing.
 
 ## Exit Codes
 
 - **0** — Success
-- **1** — General error
-- **2** — Invalid arguments
-- **3** — Configuration error
-- **4** — Bundle not found
-- **5** — Concept not found
-- **6** — Validation failed
-
-## Shell Completion
-
-Generate shell completion scripts:
-
-```bash
-# Bash
-compendium completion bash > /etc/bash_completion.d/compendium
-
-# Zsh
-compendium completion zsh > ~/.zsh/completion/_compendium
-
-# PowerShell
-compendium completion powershell > $PROFILE
-```
+- **1** — Error (missing/invalid arguments, provider not configured,
+  source not found, or — for `new` — the target directory already exists
+  and isn't empty)
 
 ## Working with Concepts
 

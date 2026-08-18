@@ -41,11 +41,13 @@ compendium chat --bundle my-catalog --allow-write
 
 Available tools:
 
-- **`ListConcepts`** — Browse all concepts
-- **`ReadConcept`** — View a specific concept's content
-- **`SearchConcepts`** — Full-text search across the catalog
-- **`ListConceptsByType`** — Filter by concept type
-- **`GetConceptMetadata`** — View frontmatter only
+- **`ListConcepts`** — Browse concepts, optionally filtered by type
+- **`ListConceptTypes`** — List the concept types this bundle's spec
+  recognizes (from `.compendium/config.json`, if present)
+- **`ReadConcept`** — View a specific concept's raw content
+- **`SearchConcepts`** — Full-text search across titles, descriptions, and bodies
+- **`ReadFile`** / **`ListFiles`** / **`ReadDirectoryStructure`** — Inspect
+  files outside the bundle (e.g. source code or docs) for grounding
 
 Example queries:
 
@@ -193,8 +195,10 @@ Status: stable (verified 2026-08-10)
 ```bash
 compendium chat --bundle my-catalog     # Read-only
 compendium chat --bundle my-catalog --allow-write  # With curation tools
-compendium chat --bundle my-catalog --model gpt-4  # Custom model
 ```
+
+The model isn't a per-session flag — it comes from `LITELLM_MODEL`,
+configured once via `compendium init`.
 
 ### Web UI Configuration
 
@@ -213,12 +217,13 @@ Edit `src/Compendium.Web/appsettings.json`:
 
 ### LLM Provider
 
-Configure via `~/.compendium/config.json` or environment variables:
+Configure via `compendium init` (writes `.env` at the repo root) or
+environment variables:
 
 ```bash
-export COMPENDIUM_BASE_URL="https://api.openai.com/v1"
-export COMPENDIUM_API_KEY="sk-..."
-export COMPENDIUM_MODEL="gpt-4"
+export LITELLM_BASE_URL="https://api.openai.com/v1"
+export LITELLM_API_KEY="sk-..."
+export LITELLM_MODEL="gpt-4"
 ```
 
 See [Configuration Guide](../getting-started/configuration.md) for details.
@@ -260,9 +265,10 @@ Enable `--allow-write` only when actively curating. For queries, read-only mode 
 
 ### CLI Sessions
 
-- **Exit**: Type `exit`, `quit`, or press Ctrl+C
-- **History**: Up/down arrows navigate command history
-- **Multi-line**: Queries can span multiple lines
+- **Exit**: Type `exit` (case-insensitive), press Enter on an empty line,
+  or Ctrl+C
+- Each line you type is one query — there's no in-session command history
+  or multi-line input today
 
 ### Web UI Sessions
 
@@ -302,7 +308,7 @@ Enable `--allow-write` only when actively curating. For queries, read-only mode 
 **Problem**: "Failed to connect to LLM provider"
 
 **Solutions**:
-- Check API key: `cat ~/.compendium/config.json`
+- Check API key: `cat .env` (at the repo root)
 - Verify base URL is correct
 - Test connectivity: `curl -I https://api.openai.com/v1/models`
 - Check firewall/proxy settings

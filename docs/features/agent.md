@@ -349,13 +349,9 @@ Different models offer different trade-offs:
 - **Claude Opus** — Most capable, best for complex curation
 - Good for: Large-scale curation, complex lineage tracing
 
-Configure via:
-
-```bash
-compendium chat --bundle my-catalog --model gpt-4-turbo-preview
-```
-
-Or in `~/.compendium/config.json`.
+The model isn't a per-session flag — configure it once via `compendium init`
+(writes `LITELLM_MODEL` to `.env`), or set the `LITELLM_MODEL` environment
+variable directly.
 
 ## Limitations
 

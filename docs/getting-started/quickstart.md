@@ -15,16 +15,21 @@ This interactive command will prompt you for:
 - API key
 - Model name
 
-The configuration is saved to `~/.compendium/config.json`.
+The configuration is saved to a `.env` file at the repo root.
 
 ## 2. Create a Bundle
 
 A bundle is a directory containing OKF concepts. Create one:
 
 ```bash
-mkdir -p my-catalog
+compendium new my-catalog
 cd my-catalog
 ```
+
+This scaffolds `.compendium/config.json` (the concept types this bundle
+recognizes), an `index.md`, and one seed concept
+(`systems/example-system.md`) showing the expected shape — replace or
+delete it once you have real concepts.
 
 ## 3. Ingest Documents
 

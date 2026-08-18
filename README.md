@@ -195,6 +195,19 @@ compendium init
 
 ## Using Compendium
 
+### Create a bundle
+
+```bash
+compendium new my-catalog
+```
+
+This scaffolds a new OKF bundle: a `.compendium/config.json` declaring the
+concept types the bundle recognizes — the system agent's `CreateConcept`
+tool is checked against it — an `index.md`, and one hand-written seed
+concept (`systems/example-system.md`) showing the expected frontmatter
+shape. Grow it from there with `compendium ingest`, by hand, or by chatting
+with `--allow-write`.
+
 ### Web UI
 
 Run the Blazor Server web interface for a visual catalog browser and chat:

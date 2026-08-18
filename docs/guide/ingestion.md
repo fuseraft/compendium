@@ -11,7 +11,7 @@ compendium ingest --source <file-or-dir> --bundle <bundlePath> [--type <ConceptT
 ### Parameters
 
 - **`--source`** — A single file or a directory (walked recursively)
-- **`--bundle`** — The OKF bundle directory to write into (created if it doesn't exist)
+- **`--bundle`** — The OKF bundle directory to write into (created if it doesn't exist, though bare — for a bundle with a starter type spec and seed concept already in place, run `compendium new <path>` first)
 - **`--type`** — The concept type recorded in frontmatter (defaults to "Document")
 
 ### Examples

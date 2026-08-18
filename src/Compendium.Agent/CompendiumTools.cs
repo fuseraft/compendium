@@ -54,10 +54,28 @@ public sealed class CompendiumTools
         return result.Length == 0 ? $"No concepts matched '{query}'." : result;
     }
 
+    [Description("List the concept types recognized by this bundle's spec (.compendium/config.json), with their directory and description. If the bundle has no spec, says so — any type is allowed.")]
+    public string ListConceptTypes()
+    {
+        var config = BundleConfig.Load(_bundle.RootPath);
+        if (config.Types.Count == 0)
+        {
+            return "This bundle has no .compendium/config.json spec — any concept type is allowed.";
+        }
+
+        var lines = config.Types
+            .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(kv => $"{kv.Key} ({kv.Value.Directory ?? "?"}): {kv.Value.Description}");
+
+        return string.Join('\n', lines);
+    }
+
     [Description("""
         Create a new concept in the knowledge bundle. Always saved as
         status: draft and attributed to this agent — you cannot mark a
-        concept stable or verified; only a human can do that.
+        concept stable or verified; only a human can do that. Call
+        ListConceptTypes first if you're unsure which types this bundle
+        recognizes.
         """)]
     public string CreateConcept(
         [Description("Concept type, e.g. 'System', 'Process', 'Integration'.")] string type,
@@ -66,7 +84,25 @@ public sealed class CompendiumTools
         [Description("Markdown body, e.g. starting with '# Overview'.")] string body,
         [Description("Optional extra tags beyond the automatic 'agent-authored' tag.")] string[]? tags = null)
     {
-        var result = ConceptWriter.Create(_bundle.RootPath, type, title, description, body, tags, Actor, DateTime.UtcNow);
+        var config = BundleConfig.Load(_bundle.RootPath);
+        var decision = config.CheckType(type);
+        if (decision == TypeDecision.Rejected)
+        {
+            return $"'{type}' is not a recognized concept type for this bundle. " +
+                   $"Allowed types: {config.AllowedTypesSummary()}. Call ListConceptTypes for details.";
+        }
+
+        var atUtc = DateTime.UtcNow;
+        var result = ConceptWriter.Create(_bundle.RootPath, type, title, description, body, tags, Actor, atUtc);
+
+        if (result.Success && decision == TypeDecision.Proposed)
+        {
+            ConceptLog.Append(
+                _bundle.RootPath,
+                $"**New type proposed** — `{type}` is not yet in this bundle's `.compendium/config.json`; review and either add it to the spec or re-type the concept.",
+                atUtc);
+        }
+
         Reload(result);
         return result.Message;
     }

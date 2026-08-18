@@ -65,9 +65,13 @@ my-bundle/
 ├── references/             # Source documents preserved
 │   ├── oms-wiki.html
 │   └── integration-spec.pdf
-└── .compendium/            # Bundle configuration (optional)
+└── .compendium/            # Bundle spec (optional — see below)
     └── config.json
 ```
+
+`compendium new my-catalog` scaffolds this whole layout, including a
+starter `.compendium/config.json` and one seed concept. It's still just a
+directory afterward — nothing about it requires the CLI going forward.
 
 ### Type Directories
 
@@ -86,6 +90,48 @@ The `references/` directory stores original source documents:
 - Preserves provenance
 - Allows verification against source
 - Never modified by agents
+
+### Bundle Spec (`.compendium/config.json`)
+
+This is a Compendium extension, not part of OKF SPEC.md — a bundle without
+this file is fully unconstrained, exactly as bundles behaved before it
+existed. When present, it's the taxonomy the system agent's `CreateConcept`
+tool is checked against:
+
+```json
+{
+  "name": "my-catalog",
+  "description": "Describe what this bundle catalogs.",
+  "types": {
+    "System": {
+      "directory": "systems",
+      "description": "An application, service, or database."
+    },
+    "Process": {
+      "directory": "processes",
+      "description": "A business workflow spanning one or more systems."
+    }
+  },
+  "allow_new_types": "propose"
+}
+```
+
+- **`types`** — the recognized concept types, each with a `directory` and
+  `description`. The agent's `ListConceptTypes` tool reads this so it can
+  discover the taxonomy before creating a concept.
+- **`allow_new_types`** — what happens when an agent asks to create a
+  concept of a type not listed above:
+    - `"open"` — allowed, no record kept (pre-spec behavior).
+    - `"propose"` (default when scaffolded) — allowed, but a note is
+      appended to `log.md` flagging the type as unrecognized, for a human
+      to later add to the spec or reject.
+    - `"closed"` — rejected outright; the agent is told the allowed types
+      and asked to pick one.
+
+`compendium new` scaffolds this file with `System`, `Process`, and
+`Integration` in `"propose"` mode — permissive enough not to block an
+agent from growing the bundle past its starting shape, but visible enough
+that drift doesn't happen silently.
 
 ## OKF Concept Structure
 
@@ -265,6 +311,7 @@ Example: Create a bundle with a Python script using OKF spec, then query it with
 Version control your bundle:
 
 ```bash
+compendium new my-catalog
 cd my-catalog
 git init
 git add .
