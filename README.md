@@ -359,3 +359,7 @@ Compendium consumes and produces the [Open Knowledge Format](https://github.com/
 (v0.2) as its bundle format. It does not fork or redefine the spec —
 any OKF-conformant bundle, however it was produced, is a bundle Compendium
 can curate and answer questions over.
+
+## License
+
+Compendium is licensed under the [Apache License 2.0](LICENSE).
