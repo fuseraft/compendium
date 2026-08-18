@@ -1021,6 +1021,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#bundle-spec-compendiumconfigjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bundle Spec (.compendium/config.json)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1892,6 +1903,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#bundle-spec-compendiumconfigjson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bundle Spec (.compendium/config.json)
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2345,9 +2367,12 @@
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>├── references/             # Source documents preserved
 </span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>│   ├── oms-wiki.html
 </span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>│   └── integration-spec.pdf
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>└── .compendium/            # Bundle configuration (optional)
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>└── .compendium/            # Bundle spec (optional — see below)
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    └── config.json
 </span></code></pre></div>
+<p><code>compendium new my-catalog</code> scaffolds this whole layout, including a
+starter <code>.compendium/config.json</code> and one seed concept. It's still just a
+directory afterward — nothing about it requires the CLI going forward.</p>
 <h3 id="type-directories">Type Directories<a class="headerlink" href="#type-directories" title="Permanent link">&para;</a></h3>
 <p>Concepts are organized by type into directories:</p>
 <ul>
@@ -2364,44 +2389,84 @@
 <li>Allows verification against source</li>
 <li>Never modified by agents</li>
 </ul>
+<h3 id="bundle-spec-compendiumconfigjson">Bundle Spec (<code>.compendium/config.json</code>)<a class="headerlink" href="#bundle-spec-compendiumconfigjson" title="Permanent link">&para;</a></h3>
+<p>This is a Compendium extension, not part of OKF SPEC.md — a bundle without
+this file is fully unconstrained, exactly as bundles behaved before it
+existed. When present, it's the taxonomy the system agent's <code>CreateConcept</code>
+tool is checked against:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"my-catalog"</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Describe what this bundle catalogs."</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">"types"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">"System"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">"directory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"systems"</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An application, service, or database."</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="nt">"Process"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nt">"directory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"processes"</span><span class="p">,</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A business workflow spanning one or more systems."</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="nt">"allow_new_types"</span><span class="p">:</span><span class="w"> </span><span class="s2">"propose"</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><strong><code>types</code></strong> — the recognized concept types, each with a <code>directory</code> and
+  <code>description</code>. The agent's <code>ListConceptTypes</code> tool reads this so it can
+  discover the taxonomy before creating a concept.</li>
+<li><strong><code>allow_new_types</code></strong> — what happens when an agent asks to create a
+  concept of a type not listed above:<ul>
+<li><code>"open"</code> — allowed, no record kept (pre-spec behavior).</li>
+<li><code>"propose"</code> (default when scaffolded) — allowed, but a note is
+  appended to <code>log.md</code> flagging the type as unrecognized, for a human
+  to later add to the spec or reject.</li>
+<li><code>"closed"</code> — rejected outright; the agent is told the allowed types
+  and asked to pick one.</li>
+</ul>
+</li>
+</ul>
+<p><code>compendium new</code> scaffolds this file with <code>System</code>, <code>Process</code>, and
+<code>Integration</code> in <code>"propose"</code> mode — permissive enough not to block an
+agent from growing the bundle past its starting shape, but visible enough
+that drift doesn't happen silently.</p>
 <h2 id="okf-concept-structure">OKF Concept Structure<a class="headerlink" href="#okf-concept-structure" title="Permanent link">&para;</a></h2>
 <p>Each concept is a markdown file with YAML frontmatter:</p>
-<div class="language-markdown highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>---
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="gh"># Required</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>type: System
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>title: "Order Management System"
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="gh"># Recommended</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>description: "Handles customer orders from placement through fulfillment"
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>tags: [critical, ecommerce]
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>status: stable
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="gh"># Provenance</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>generated:
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>  by: process:compendium-ingest/0.1
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>  at: 2026-08-16T10:30:00Z
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>sources:
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>id: wiki
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    resource: /references/oms-wiki.html
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    title: "OMS Wiki Page"
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="gh"># Trust</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>verified:
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>  by: user:alice
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  at: 2026-08-16T14:00:00Z
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="gh"># Lifecycle</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="gu">stale_after: 2027-02-16</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="gu">---</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="gh"># Overview</span>
-</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>
-</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>The Order Management System (OMS) is the core system for...
-</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
-</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="gu">## Dependencies</span>
-</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>
-</span><span id="__span-4-35"><a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a><span class="k">-</span><span class="w"> </span>Payment Gateway (Stripe)
-</span><span id="__span-4-36"><a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a><span class="k">-</span><span class="w"> </span>Inventory System
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>---
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="gh"># Required</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>type: System
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>title: "Order Management System"
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="gh"># Recommended</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>description: "Handles customer orders from placement through fulfillment"
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>tags: [critical, ecommerce]
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>status: stable
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="gh"># Provenance</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>generated:
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>  by: process:compendium-ingest/0.1
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>  at: 2026-08-16T10:30:00Z
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>sources:
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">  </span><span class="k">-</span><span class="w"> </span>id: wiki
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    resource: /references/oms-wiki.html
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    title: "OMS Wiki Page"
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="gh"># Trust</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>verified:
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>  by: user:alice
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>  at: 2026-08-16T14:00:00Z
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="gh"># Lifecycle</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="gu">stale_after: 2027-02-16</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="gu">---</span>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="gh"># Overview</span>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a>
+</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a>The Order Management System (OMS) is the core system for...
+</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a>
+</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="gu">## Dependencies</span>
+</span><span id="__span-5-34"><a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>
+</span><span id="__span-5-35"><a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="k">-</span><span class="w"> </span>Payment Gateway (Stripe)
+</span><span id="__span-5-36"><a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="k">-</span><span class="w"> </span>Inventory System
 </span></code></pre></div>
 <h3 id="frontmatter-fields">Frontmatter Fields<a class="headerlink" href="#frontmatter-fields" title="Permanent link">&para;</a></h3>
 <h4 id="required">Required<a class="headerlink" href="#required" title="Permanent link">&para;</a></h4>
@@ -2441,27 +2506,27 @@
 <p>No proprietary formats. Every concept is readable with <code>cat</code> or any text editor.</p>
 <h3 id="2-explicit-provenance">2. Explicit Provenance<a class="headerlink" href="#2-explicit-provenance" title="Permanent link">&para;</a></h3>
 <p>Every concept must trace back to where it came from:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">sources</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">confluence-123</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/references/confluence-page-123.html</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Architecture</span><span class="nv"> </span><span class="s">Overview</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">Confluence"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">sources</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">confluence-123</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/references/confluence-page-123.html</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Architecture</span><span class="nv"> </span><span class="s">Overview</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">Confluence"</span>
 </span></code></pre></div>
 <h3 id="3-trust-metadata">3. Trust Metadata<a class="headerlink" href="#3-trust-metadata" title="Permanent link">&para;</a></h3>
 <p>Distinguish agent-generated drafts from human-verified knowledge:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">draft</span><span class="w">                   </span><span class="c1"># Unverified</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">generated</span><span class="p">:</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">agent:compendium/0.1</span><span class="w">      </span><span class="c1"># Who created it</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-08-16T10:00:00Z</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">draft</span><span class="w">                   </span><span class="c1"># Unverified</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">generated</span><span class="p">:</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">agent:compendium/0.1</span><span class="w">      </span><span class="c1"># Who created it</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-08-16T10:00:00Z</span>
 </span></code></pre></div>
 <p>vs.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable</span><span class="w">                  </span><span class="c1"># Human-approved</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">verified</span><span class="p">:</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user:architect-team</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-08-16T14:00:00Z</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable</span><span class="w">                  </span><span class="c1"># Human-approved</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">verified</span><span class="p">:</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">by</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">user:architect-team</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2026-08-16T14:00:00Z</span>
 </span></code></pre></div>
 <h3 id="4-staleness-detection">4. Staleness Detection<a class="headerlink" href="#4-staleness-detection" title="Permanent link">&para;</a></h3>
 <p>Knowledge has a shelf life:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">stale_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2027-02-16</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">stale_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2027-02-16</span>
 </span></code></pre></div>
 <p>Agents can flag concepts past their review date for re-verification.</p>
 <h3 id="5-portable-identifiers">5. Portable Identifiers<a class="headerlink" href="#5-portable-identifiers" title="Permanent link">&para;</a></h3>
@@ -2484,18 +2549,18 @@
 <h3 id="extensions">Extensions<a class="headerlink" href="#extensions" title="Permanent link">&para;</a></h3>
 <p>Compendium adds optional fields for specific use cases:</p>
 <h4 id="data-maps">Data Maps<a class="headerlink" href="#data-maps" title="Permanent link">&para;</a></h4>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">source_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"ODS,</span><span class="nv"> </span><span class="s">Warehouse"</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">destination_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"Reports,</span><span class="nv"> </span><span class="s">SFTP"</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">destination_types</span><span class="p">:</span><span class="w"> </span><span class="s">"File,</span><span class="nv"> </span><span class="s">Email"</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nt">field_count</span><span class="p">:</span><span class="w"> </span><span class="s">"23"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">source_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"ODS,</span><span class="nv"> </span><span class="s">Warehouse"</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">destination_systems</span><span class="p">:</span><span class="w"> </span><span class="s">"Reports,</span><span class="nv"> </span><span class="s">SFTP"</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nt">destination_types</span><span class="p">:</span><span class="w"> </span><span class="s">"File,</span><span class="nv"> </span><span class="s">Email"</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nt">field_count</span><span class="p">:</span><span class="w"> </span><span class="s">"23"</span>
 </span></code></pre></div>
 <h4 id="diagrams">Diagrams<a class="headerlink" href="#diagrams" title="Permanent link">&para;</a></h4>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">shape_count</span><span class="p">:</span><span class="w"> </span><span class="s">"15"</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">page_name</span><span class="p">:</span><span class="w"> </span><span class="s">"System</span><span class="nv"> </span><span class="s">Overview"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">shape_count</span><span class="p">:</span><span class="w"> </span><span class="s">"15"</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nt">page_name</span><span class="p">:</span><span class="w"> </span><span class="s">"System</span><span class="nv"> </span><span class="s">Overview"</span>
 </span></code></pre></div>
 <h4 id="architecture-models">Architecture Models<a class="headerlink" href="#architecture-models" title="Permanent link">&para;</a></h4>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">archimate_type</span><span class="p">:</span><span class="w"> </span><span class="s">"ApplicationComponent"</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nt">layer</span><span class="p">:</span><span class="w"> </span><span class="s">"Application"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">archimate_type</span><span class="p">:</span><span class="w"> </span><span class="s">"ApplicationComponent"</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nt">layer</span><span class="p">:</span><span class="w"> </span><span class="s">"Application"</span>
 </span></code></pre></div>
 <p>These extensions are ignored by other OKF-compliant tools, preserving portability.</p>
 <h2 id="interoperability">Interoperability<a class="headerlink" href="#interoperability" title="Permanent link">&para;</a></h2>
@@ -2509,36 +2574,37 @@
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="1-use-git">1. Use Git<a class="headerlink" href="#1-use-git" title="Permanent link">&para;</a></h3>
 <p>Version control your bundle:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nb">cd</span><span class="w"> </span>my-catalog
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>git<span class="w"> </span>init
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>git<span class="w"> </span>add<span class="w"> </span>.
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Initial catalog"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>compendium<span class="w"> </span>new<span class="w"> </span>my-catalog
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">cd</span><span class="w"> </span>my-catalog
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>git<span class="w"> </span>init
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>git<span class="w"> </span>add<span class="w"> </span>.
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Initial catalog"</span>
 </span></code></pre></div>
 <h3 id="2-keep-sources">2. Keep Sources<a class="headerlink" href="#2-keep-sources" title="Permanent link">&para;</a></h3>
 <p>Always preserve original files in <code>references/</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">sources</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">original</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/references/architecture-doc.pdf</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Architecture</span><span class="nv"> </span><span class="s">Document</span><span class="nv"> </span><span class="s">v2.3"</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">sources</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">original</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/references/architecture-doc.pdf</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="s">"Architecture</span><span class="nv"> </span><span class="s">Document</span><span class="nv"> </span><span class="s">v2.3"</span>
 </span></code></pre></div>
 <h3 id="3-review-before-stable">3. Review Before Stable<a class="headerlink" href="#3-review-before-stable" title="Permanent link">&para;</a></h3>
 <p>Don't promote concepts to <code>stable</code> until verified:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Start as draft</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>status:<span class="w"> </span>draft
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1"># After human review</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>status:<span class="w"> </span>stable
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>verified:
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">  </span>by:<span class="w"> </span>user:yourname
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">  </span>at:<span class="w"> </span><span class="m">2026</span>-08-16T14:00:00Z
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Start as draft</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>status:<span class="w"> </span>draft
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="c1"># After human review</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>status:<span class="w"> </span>stable
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>verified:
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span>by:<span class="w"> </span>user:yourname
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span>at:<span class="w"> </span><span class="m">2026</span>-08-16T14:00:00Z
 </span></code></pre></div>
 <h3 id="4-set-staleness-dates">4. Set Staleness Dates<a class="headerlink" href="#4-set-staleness-dates" title="Permanent link">&para;</a></h3>
 <p>Time-sensitive knowledge needs review dates:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nt">stale_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2027-02-16</span><span class="w">  </span><span class="c1"># Review in 6 months</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">stale_after</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2027-02-16</span><span class="w">  </span><span class="c1"># Review in 6 months</span>
 </span></code></pre></div>
 <h3 id="5-tag-consistently">5. Tag Consistently<a class="headerlink" href="#5-tag-consistently" title="Permanent link">&para;</a></h3>
 <p>Use consistent tags across similar concepts:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">imported</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">critical</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">security-sensitive</span><span class="p p-Indicator">]</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">imported</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">critical</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">security-sensitive</span><span class="p p-Indicator">]</span>
 </span></code></pre></div>
 <h2 id="tools-and-ecosystem">Tools and Ecosystem<a class="headerlink" href="#tools-and-ecosystem" title="Permanent link">&para;</a></h2>
 <h3 id="compendium">Compendium<a class="headerlink" href="#compendium" title="Permanent link">&para;</a></h3>
@@ -2587,7 +2653,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 16, 2026 22:49:34 UTC">August 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 02:08:57 UTC">August 18, 2026</span>
   </span>
 
     
