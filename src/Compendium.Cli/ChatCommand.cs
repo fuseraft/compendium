@@ -17,11 +17,16 @@ public static class ChatCommand
         var settings = AgentSettings.TryLoad();
         if (settings is null)
         {
-            Console.WriteLine("Not configured yet — run `dotnet run --project src/Compendium.Cli -- init` first.");
+            Console.WriteLine("Not configured yet — run `compendium init` first.");
             return 1;
         }
 
         var bundlePath = ParseBundlePath(args) ?? RepoLocator.DefaultBundlePath();
+        if (bundlePath is null)
+        {
+            Console.WriteLine("--bundle <path> is required.");
+            return 1;
+        }
         var allowWrite = args.Contains("--allow-write");
         var bundle = BundleLoader.LoadBundle(bundlePath);
         var tools = new CompendiumTools(bundle);

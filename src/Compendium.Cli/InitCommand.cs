@@ -33,7 +33,7 @@ public static class InitCommand
         Console.WriteLine();
         Console.WriteLine($"Saved to {LlmConfigStore.ConfigPath} (API key in {keyStore.StoreName}).");
         Console.WriteLine("This also configures the Web UI — no separate setup needed there.");
-        Console.WriteLine("Run `dotnet run --project src/Compendium.Cli -- chat` to start.");
+        Console.WriteLine("Run `compendium chat` to start.");
         return 0;
     }
 

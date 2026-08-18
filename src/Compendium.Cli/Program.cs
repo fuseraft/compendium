@@ -1,4 +1,17 @@
+using System.Reflection;
 using Compendium.Cli;
+
+if (args.Length > 0 && args[0] == "--version")
+{
+    var informational = Assembly.GetExecutingAssembly()
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+        ?? "0.0.1";
+    // Strip the SDK's auto-appended "+<git-sha>" build metadata — not
+    // useful in a human-facing --version, and install.sh just echoes this.
+    var version = informational.Split('+')[0];
+    Console.WriteLine(version);
+    return 0;
+}
 
 if (args.Length > 0 && args[0] == "init")
 {
