@@ -1067,10 +1067,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#config-file-location" class="md-nav__link">
+  <a href="#config-location" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Config File Location
+        Config Location
       
     </span>
   </a>
@@ -1078,21 +1078,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#config-file-format" class="md-nav__link">
+  <a href="#environment-variables-ci-scripting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Config File Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment Variables
+        Environment Variables (CI / scripting)
       
     </span>
   </a>
@@ -1910,10 +1899,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#config-file-location" class="md-nav__link">
+  <a href="#config-location" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Config File Location
+        Config Location
       
     </span>
   </a>
@@ -1921,21 +1910,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#config-file-format" class="md-nav__link">
+  <a href="#environment-variables-ci-scripting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Config File Format
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#environment-variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment Variables
+        Environment Variables (CI / scripting)
       
     </span>
   </a>
@@ -2090,9 +2068,12 @@
   endpoint, or type a model id directly if that fetch fails</p>
 <p>There's no separate overwrite flag — re-running <code>init</code> shows your current
 values as defaults, so it doubles as "reconfigure."</p>
-<p>Configuration is saved to a <code>.env</code> file at the repo root
-(<code>LITELLM_BASE_URL</code>, <code>LITELLM_API_KEY</code>, <code>LITELLM_MODEL</code>), not a JSON config
-file.</p>
+<p>Configuration is saved to the same store the Web UI's Settings page
+(<code>/settings</code>) reads and writes: <code>~/.compendium/llm-config.json</code> for the
+base URL and model, and the OS credential store (or a plain-text fallback
+where none is available) for the API key. Whichever one you configure
+through — <code>init</code> or the Web UI — the other picks it up automatically;
+there's no config file for you to edit directly.</p>
 <h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h4>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>compendium<span class="w"> </span>init
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Compendium<span class="w"> </span>setup<span class="w"> </span>—<span class="w"> </span>configure<span class="w"> </span>your<span class="w"> </span>model<span class="w"> </span>provider.
@@ -2105,8 +2086,9 @@ file.</p>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="m">3</span>.<span class="w"> </span>gpt-3.5-turbo
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>Model<span class="w"> </span><span class="o">(</span>number<span class="w"> </span>or<span class="w"> </span>id<span class="o">)</span>:<span class="w"> </span><span class="m">1</span>
 </span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>Saved<span class="w"> </span>to<span class="w"> </span>/home/you/compendium/.env
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>Run<span class="w"> </span><span class="sb">`</span>dotnet<span class="w"> </span>run<span class="w"> </span>--project<span class="w"> </span>src/Compendium.Cli<span class="w"> </span>--<span class="w"> </span>chat<span class="sb">`</span><span class="w"> </span>to<span class="w"> </span>start.
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>Saved<span class="w"> </span>to<span class="w"> </span>/home/you/.compendium/llm-config.json<span class="w"> </span><span class="o">(</span>API<span class="w"> </span>key<span class="w"> </span><span class="k">in</span><span class="w"> </span>Windows<span class="w"> </span>Credential<span class="w"> </span>Manager<span class="o">)</span>.
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>This<span class="w"> </span>also<span class="w"> </span>configures<span class="w"> </span>the<span class="w"> </span>Web<span class="w"> </span>UI<span class="w"> </span>—<span class="w"> </span>no<span class="w"> </span>separate<span class="w"> </span>setup<span class="w"> </span>needed<span class="w"> </span>there.
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>Run<span class="w"> </span><span class="sb">`</span>dotnet<span class="w"> </span>run<span class="w"> </span>--project<span class="w"> </span>src/Compendium.Cli<span class="w"> </span>--<span class="w"> </span>chat<span class="sb">`</span><span class="w"> </span>to<span class="w"> </span>start.
 </span></code></pre></div>
 <hr />
 <h3 id="new"><code>new</code><a class="headerlink" href="#new" title="Permanent link">&para;</a></h3>
@@ -2186,7 +2168,8 @@ report.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>--allow-write<span class="w">          </span>Enable<span class="w"> </span>agent<span class="w"> </span>curation<span class="w"> </span>tools<span class="w"> </span><span class="o">(</span>CreateConcept,<span class="w"> </span>UpdateConceptBody,<span class="w"> </span>AddLink,<span class="w"> </span>FlagForReview<span class="o">)</span>
 </span></code></pre></div>
 <p>There's no <code>--model</code>, <code>--temperature</code>, or <code>--max-tokens</code> flag — the model
-comes from <code>LITELLM_MODEL</code> in <code>.env</code> (set via <code>compendium init</code>).</p>
+comes from the config saved by <code>compendium init</code> (or the <code>LITELLM_MODEL</code>
+environment variable, see <a href="#configuration">Configuration</a> below).</p>
 <h4 id="examples_1">Examples<a class="headerlink" href="#examples_1" title="Permanent link">&para;</a></h4>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Read-only session</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
@@ -2224,26 +2207,24 @@ you type that isn't blank or <code>exit</code> is sent to the agent as a query.<
 </div>
 <hr />
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<h3 id="config-file-location">Config File Location<a class="headerlink" href="#config-file-location" title="Permanent link">&para;</a></h3>
-<p><code>.env</code> at the repo root (found by walking up from the running executable
-to <code>Compendium.slnx</code>). There's no <code>--config</code> flag or <code>COMPENDIUM_CONFIG</code>
-variable to override the path.</p>
-<h3 id="config-file-format">Config File Format<a class="headerlink" href="#config-file-format" title="Permanent link">&para;</a></h3>
-<p>Plain <code>KEY=value</code> lines, written by <code>compendium init</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>LITELLM_BASE_URL=https://api.openai.com/v1
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>LITELLM_API_KEY=sk-...
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>LITELLM_MODEL=gpt-4-turbo-preview
+<h3 id="config-location">Config Location<a class="headerlink" href="#config-location" title="Permanent link">&para;</a></h3>
+<p>There's no config file to edit and no <code>--config</code> flag or
+<code>COMPENDIUM_CONFIG</code> variable. <code>compendium init</code> (or the Web UI's Settings
+page) persists to <code>~/.compendium/llm-config.json</code> plus the OS credential
+store for the API key — see
+<a href="../../getting-started/configuration/#llm-provider-configuration">Configuration</a>
+for the full breakdown.</p>
+<h3 id="environment-variables-ci-scripting">Environment Variables (CI / scripting)<a class="headerlink" href="#environment-variables-ci-scripting" title="Permanent link">&para;</a></h3>
+<p>For non-interactive use, <code>LITELLM_BASE_URL</code>, <code>LITELLM_API_KEY</code>, and
+<code>LITELLM_MODEL</code> are honored as a fallback when nothing has been configured
+via <code>init</code> or the Web UI:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_BASE_URL</span><span class="o">=</span><span class="s2">"https://api.openai.com/v1"</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_API_KEY</span><span class="o">=</span><span class="s2">"sk-..."</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_MODEL</span><span class="o">=</span><span class="s2">"gpt-4"</span>
 </span></code></pre></div>
-<h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
-<p>The same three variables can be set directly in the environment instead of
-(or to override) <code>.env</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_BASE_URL</span><span class="o">=</span><span class="s2">"https://api.openai.com/v1"</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_API_KEY</span><span class="o">=</span><span class="s2">"sk-..."</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LITELLM_MODEL</span><span class="o">=</span><span class="s2">"gpt-4"</span>
-</span></code></pre></div>
-<p><code>LITELLM_MODEL</code> falls back to <code>anthropic.claude-sonnet-5</code> if unset;
-<code>LITELLM_BASE_URL</code> and <code>LITELLM_API_KEY</code> are required — <code>chat</code> exits with
-an error telling you to run <code>init</code> if either is missing.</p>
+<p><code>LITELLM_MODEL</code> falls back to <code>anthropic.claude-sonnet-5</code> if unset. <code>chat</code>
+exits with an error telling you to run <code>init</code> if neither the persisted
+config nor <code>LITELLM_BASE_URL</code>/<code>LITELLM_API_KEY</code> are set.</p>
 <h2 id="exit-codes">Exit Codes<a class="headerlink" href="#exit-codes" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>0</strong> — Success</li>
@@ -2254,70 +2235,70 @@ an error telling you to run <code>init</code> if either is missing.</p>
 <h2 id="working-with-concepts">Working with Concepts<a class="headerlink" href="#working-with-concepts" title="Permanent link">&para;</a></h2>
 <h3 id="listing-concepts">Listing Concepts<a class="headerlink" href="#listing-concepts" title="Permanent link">&para;</a></h3>
 <p>Use the chat interface or directly read bundle directories:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Via chat</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>&gt;<span class="w"> </span>List<span class="w"> </span>all<span class="w"> </span>concepts
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Via filesystem</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>ls<span class="w"> </span>my-catalog/systems/
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>ls<span class="w"> </span>my-catalog/integrations/
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>find<span class="w"> </span>my-catalog<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.md"</span><span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">"*/references/*"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Via chat</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>&gt;<span class="w"> </span>List<span class="w"> </span>all<span class="w"> </span>concepts
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="c1"># Via filesystem</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>ls<span class="w"> </span>my-catalog/systems/
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>ls<span class="w"> </span>my-catalog/integrations/
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>find<span class="w"> </span>my-catalog<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.md"</span><span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">"*/references/*"</span>
 </span></code></pre></div>
 <h3 id="reading-concepts">Reading Concepts<a class="headerlink" href="#reading-concepts" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Via chat</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>&gt;<span class="w"> </span>Read<span class="w"> </span>the<span class="w"> </span>concept<span class="w"> </span>systems/order-management
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="c1"># Via filesystem</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>cat<span class="w"> </span>my-catalog/systems/order-management.md
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1"># Via API (if web server running)</span>
-</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>curl<span class="w"> </span>http://localhost:5050/api/concepts/systems/order-management
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Via chat</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>&gt;<span class="w"> </span>Read<span class="w"> </span>the<span class="w"> </span>concept<span class="w"> </span>systems/order-management
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Via filesystem</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>cat<span class="w"> </span>my-catalog/systems/order-management.md
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="c1"># Via API (if web server running)</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>curl<span class="w"> </span>http://localhost:5050/api/concepts/systems/order-management
 </span></code></pre></div>
 <h3 id="searching-concepts">Searching Concepts<a class="headerlink" href="#searching-concepts" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Via chat</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>&gt;<span class="w"> </span>Search<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="s2">"payment"</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Via filesystem</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"payment"</span><span class="w"> </span>my-catalog/<span class="w"> </span>--include<span class="o">=</span><span class="s2">"*.md"</span><span class="w"> </span>--exclude-dir<span class="o">=</span>references
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1"># Via API</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>curl<span class="w"> </span><span class="s2">"http://localhost:5050/api/concepts/search?q=payment"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Via chat</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span>my-catalog
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>&gt;<span class="w"> </span>Search<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="s2">"payment"</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="c1"># Via filesystem</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>grep<span class="w"> </span>-r<span class="w"> </span><span class="s2">"payment"</span><span class="w"> </span>my-catalog/<span class="w"> </span>--include<span class="o">=</span><span class="s2">"*.md"</span><span class="w"> </span>--exclude-dir<span class="o">=</span>references
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="c1"># Via API</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>curl<span class="w"> </span><span class="s2">"http://localhost:5050/api/concepts/search?q=payment"</span>
 </span></code></pre></div>
 <h3 id="batch-operations">Batch Operations<a class="headerlink" href="#batch-operations" title="Permanent link">&para;</a></h3>
 <p>Use shell loops with direct file operations:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Count concepts by type</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>find<span class="w"> </span>my-catalog<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.md"</span><span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">"*/references/*"</span><span class="w"> </span>-exec<span class="w"> </span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^type:"</span><span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>xargs<span class="w"> </span>grep<span class="w"> </span><span class="s2">"^type:"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f3<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Find draft concepts</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span>my-catalog/**/*.md
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="c1"># Update all drafts to stable (manual verification recommended)</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span>my-catalog/**/*.md<span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s/^status: draft/status: stable/'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$file</span><span class="s2">"</span>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="k">done</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Count concepts by type</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>find<span class="w"> </span>my-catalog<span class="w"> </span>-name<span class="w"> </span><span class="s2">"*.md"</span><span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">"*/references/*"</span><span class="w"> </span>-exec<span class="w"> </span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^type:"</span><span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span>xargs<span class="w"> </span>grep<span class="w"> </span><span class="s2">"^type:"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>cut<span class="w"> </span>-d:<span class="w"> </span>-f3<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span><span class="p">|</span><span class="w"> </span>uniq<span class="w"> </span>-c
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Find draft concepts</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span>my-catalog/**/*.md
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="c1"># Update all drafts to stable (manual verification recommended)</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="k">for</span><span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span>my-catalog/**/*.md<span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">  </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s/^status: draft/status: stable/'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$file</span><span class="s2">"</span>
+</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="k">done</span>
 </span></code></pre></div>
 <h3 id="scripting">Scripting<a class="headerlink" href="#scripting" title="Permanent link">&para;</a></h3>
 <p>Example script to ingest and review:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="ch">#!/bin/bash</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nv">BUNDLE</span><span class="o">=</span><span class="s2">"my-catalog"</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nv">SOURCE</span><span class="o">=</span><span class="s2">"new-docs/"</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="c1"># Ingest</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Ingesting from </span><span class="nv">$SOURCE</span><span class="s2">..."</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span><span class="s2">"</span><span class="nv">$SOURCE</span><span class="s2">"</span><span class="w"> </span>--bundle<span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="c1"># Count new drafts</span>
-</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="nv">DRAFTS</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span>/**/*.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span>
-</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Created </span><span class="nv">$DRAFTS</span><span class="s2"> draft concepts"</span>
-</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>
-</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="c1"># Interactive review (if any drafts)</span>
-</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$DRAFTS</span><span class="s2">"</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-</span><span id="__span-19-15"><a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Starting chat for review..."</span>
-</span><span id="__span-19-16"><a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="w">  </span>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span><span class="w"> </span>--allow-write
-</span><span id="__span-19-17"><a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="k">fi</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="ch">#!/bin/bash</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nv">BUNDLE</span><span class="o">=</span><span class="s2">"my-catalog"</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="nv">SOURCE</span><span class="o">=</span><span class="s2">"new-docs/"</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Ingest</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Ingesting from </span><span class="nv">$SOURCE</span><span class="s2">..."</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>compendium<span class="w"> </span>ingest<span class="w"> </span>--source<span class="w"> </span><span class="s2">"</span><span class="nv">$SOURCE</span><span class="s2">"</span><span class="w"> </span>--bundle<span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="c1"># Count new drafts</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="nv">DRAFTS</span><span class="o">=</span><span class="k">$(</span>grep<span class="w"> </span>-l<span class="w"> </span><span class="s2">"^status: draft"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span>/**/*.md<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l<span class="k">)</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">"Created </span><span class="nv">$DRAFTS</span><span class="s2"> draft concepts"</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="c1"># Interactive review (if any drafts)</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$DRAFTS</span><span class="s2">"</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Starting chat for review..."</span>
+</span><span id="__span-18-16"><a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="w">  </span>compendium<span class="w"> </span>chat<span class="w"> </span>--bundle<span class="w"> </span><span class="s2">"</span><span class="nv">$BUNDLE</span><span class="s2">"</span><span class="w"> </span>--allow-write
+</span><span id="__span-18-17"><a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="k">fi</span>
 </span></code></pre></div>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
@@ -2348,7 +2329,7 @@ an error telling you to run <code>init</code> if either is missing.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 02:08:57 UTC">August 18, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 04:02:00 UTC">August 18, 2026</span>
   </span>
 
     
