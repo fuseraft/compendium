@@ -92,6 +92,7 @@
 
                     @if (BundleService.CurrentBundle != null)
                     {
+                        var config = BundleService.GetBundleConfig();
                         <div class="mt-4 pt-3 border-top">
                             <h5>Current Bundle</h5>
                             <dl class="row mb-0">
@@ -100,6 +101,22 @@
 
                                 <dt class="col-sm-3">Concepts:</dt>
                                 <dd class="col-sm-9">@BundleService.CurrentBundle.Concepts.Count</dd>
+
+                                <dt class="col-sm-3">Concept Types:</dt>
+                                <dd class="col-sm-9">
+                                    @if (config.Types.Count == 0)
+                                    {
+                                        <span class="text-muted">No <code>.compendium/config.json</code> spec — any type is allowed.</span>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var type in config.Types.Keys.OrderBy(t => t, StringComparer.OrdinalIgnoreCase))
+                                        {
+                                            <span class="badge text-bg-secondary me-1">@type</span>
+                                        }
+                                        <span class="text-muted">(new types: @config.AllowNewTypes)</span>
+                                    }
+                                </dd>
                             </dl>
                         </div>
                     }

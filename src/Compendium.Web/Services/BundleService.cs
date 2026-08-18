@@ -35,4 +35,9 @@ public class BundleService
             .OrderBy(t => t)
             .ToList();
     }
+
+    // The bundle's .compendium/config.json spec, if it has one — read fresh
+    // from disk each call since it isn't part of the in-memory Bundle model.
+    public BundleConfig GetBundleConfig() =>
+        _bundlePath is null ? BundleConfig.Unconstrained : BundleConfig.Load(_bundlePath);
 }

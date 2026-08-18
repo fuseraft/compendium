@@ -1,0 +1,154 @@
+@page "/new-bundle"
+@rendermode InteractiveServer
+@using Compendium.Okf
+@inject Services.BundleService BundleService
+@inject NavigationManager Navigation
+
+<PageTitle>New Bundle - Compendium</PageTitle>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Create New Knowledge Bundle</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        A bundle is an empty directory that gets scaffolded with a starter
+                        concept-type spec and one seed concept. Enter the path where the new
+                        bundle should be created — the directory must not already exist, or
+                        must be empty.
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <strong>Error:</strong> @errorMessage
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(successMessage))
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <strong>Success:</strong> @successMessage
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="newBundlePath" class="form-label">Bundle Path</label>
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   id="newBundlePath"
+                                   @bind="bundlePath"
+                                   @bind:event="oninput"
+                                   placeholder="e.g., catalog/my-catalog or C:\catalogs\my-catalog"
+                                   disabled="@isCreating" />
+                            <button class="btn btn-outline-secondary"
+                                    @onclick="() => showFolderBrowser = !showFolderBrowser"
+                                    disabled="@isCreating">
+                                📁 Browse
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            Browsing selects an existing parent folder — append the new
+                            bundle's directory name after picking one.
+                        </div>
+
+                        @if (showFolderBrowser)
+                        {
+                            <div class="mt-2">
+                                <FolderBrowser OnFolderSelected="HandleFolderSelected"
+                                              OnClosed="() => showFolderBrowser = false" />
+                            </div>
+                        }
+                    </div>
+
+                    <button class="btn btn-primary" @onclick="HandleCreateBundle" disabled="@(isCreating || string.IsNullOrWhiteSpace(bundlePath))">
+                        @if (isCreating)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            <span>Creating...</span>
+                        }
+                        else
+                        {
+                            <span>Create Bundle</span>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">What Gets Created</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-3">
+                        <li><code>.compendium/config.json</code> — a starter spec declaring <code>System</code>, <code>Process</code>, and <code>Integration</code> concept types in <code>"propose"</code> mode. The system agent's <code>CreateConcept</code> tool is checked against this spec.</li>
+                        <li><code>index.md</code> — a short orientation page</li>
+                        <li><code>log.md</code> — the bundle's provenance log</li>
+                        <li><code>references/</code> — empty, for source documents you later ingest</li>
+                        <li><code>systems/example-system.md</code> — a seed concept showing the expected frontmatter shape; replace or delete it</li>
+                    </ul>
+                    <p class="mb-0">
+                        Already have a bundle? <a href="/load-bundle">Load an existing one</a> instead.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string bundlePath = "";
+    private bool isCreating = false;
+    private bool showFolderBrowser = false;
+    private string? errorMessage = null;
+    private string? successMessage = null;
+
+    private void HandleFolderSelected(string path)
+    {
+        bundlePath = path;
+        showFolderBrowser = false;
+    }
+
+    private async Task HandleCreateBundle()
+    {
+        if (string.IsNullOrWhiteSpace(bundlePath))
+            return;
+
+        isCreating = true;
+        errorMessage = null;
+        successMessage = null;
+        StateHasChanged();
+
+        await Task.Delay(100); // Let UI update
+
+        try
+        {
+            var result = BundleScaffold.Create(bundlePath, DateTime.UtcNow);
+            if (!result.Success)
+            {
+                errorMessage = result.Message;
+                return;
+            }
+
+            BundleService.LoadBundle(bundlePath);
+            successMessage = $"{result.Message} Loaded {BundleService.CurrentBundle?.Concepts.Count ?? 0} concept(s).";
+
+            // Navigate to the catalog after a short delay
+            await Task.Delay(1500);
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to create bundle: {ex.Message}";
+        }
+        finally
+        {
+            isCreating = false;
+            StateHasChanged();
+        }
+    }
+}
