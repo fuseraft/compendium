@@ -1,5 +1,6 @@
 @page "/settings"
 @rendermode InteractiveServer
+@using Compendium.Agent.KeyStore
 @inject Services.LlmConfigService LlmConfigService
 @inject Services.BundleService BundleService
 @inject NavigationManager Navigation
@@ -255,6 +256,10 @@
             await LlmConfigService.ConfigureAsync(baseUrl, apiKey, modelName);
             var keyStore = LlmConfigService.GetKeyStoreInfo();
             successMessage = $"Configuration saved to {keyStore}! You can now use the chat interface.";
+        }
+        catch (KeyStoreUnavailableException ex)
+        {
+            errorMessage = ex.Message;
         }
         catch (Exception ex)
         {

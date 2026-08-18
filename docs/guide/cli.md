@@ -39,10 +39,12 @@ values as defaults, so it doubles as "reconfigure."
 
 Configuration is saved to the same store the Web UI's Settings page
 (`/settings`) reads and writes: `~/.compendium/llm-config.json` for the
-base URL and model, and the OS credential store (or a plain-text fallback
-where none is available) for the API key. Whichever one you configure
-through — `init` or the Web UI — the other picks it up automatically;
-there's no config file for you to edit directly.
+base URL and model, and the OS credential store (Windows Credential
+Manager, macOS Keychain, or `secret-tool` on Linux) for the API key —
+never plaintext on disk. If no keychain is reachable, `init` exits with an
+error pointing you at `LITELLM_API_KEY` instead. Whichever one you
+configure through — `init` or the Web UI — the other picks it up
+automatically; there's no config file for you to edit directly.
 
 #### Example
 

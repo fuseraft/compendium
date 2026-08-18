@@ -28,7 +28,17 @@ public static class InitCommand
         var model = await PromptModelAsync(baseUrl, apiKey, existing?.ModelName);
 
         LlmConfigStore.Save(new LlmConfig { BaseUrl = baseUrl, ModelName = model });
-        await keyStore.StoreAsync(apiKey);
+
+        try
+        {
+            await keyStore.StoreAsync(apiKey);
+        }
+        catch (KeyStoreUnavailableException ex)
+        {
+            Console.WriteLine();
+            Console.WriteLine(ex.Message);
+            return 1;
+        }
 
         Console.WriteLine();
         Console.WriteLine($"Saved to {LlmConfigStore.ConfigPath} (API key in {keyStore.StoreName}).");

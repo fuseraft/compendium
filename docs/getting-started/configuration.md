@@ -27,10 +27,13 @@ fields, same shared result.
 ### Where it's stored
 
 - Base URL and model name: `~/.compendium/llm-config.json`
-- API key: the OS-native credential store where available (Windows
-  Credential Manager today; see [issue tracker](https://github.com/fuseraft/compendium/issues)
-  for macOS Keychain / Linux Secret Service support), falling back to a
-  plain-text file in `~/.compendium/` on platforms without one yet
+- API key: the OS-native credential store — Windows Credential Manager,
+  macOS Keychain, or the Secret Service API on Linux (GNOME Keyring, KWallet,
+  etc. via `secret-tool`). Compendium never writes API keys to disk in
+  plaintext. If no keychain is reachable (e.g. a headless Linux box with no
+  secret service running), `init` and the Settings page both fail with a
+  clear error telling you to set `LITELLM_API_KEY` as an environment
+  variable instead.
 
 ### Supported Providers
 

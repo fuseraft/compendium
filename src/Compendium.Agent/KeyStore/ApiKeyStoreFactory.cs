@@ -7,8 +7,15 @@ public static class ApiKeyStoreFactory
         if (OperatingSystem.IsWindows())
             return new WindowsCredentialManagerStore();
 
-        // TODO: Add macOS Keychain and Linux SecretTool support
-        // For now, fallback to plain text on non-Windows platforms
-        return new PlainTextKeyStore();
+        if (OperatingSystem.IsMacOS())
+            return new MacOsKeychainStore();
+
+        if (OperatingSystem.IsLinux())
+        {
+            var store = new SecretToolKeyStore();
+            if (store.IsAvailable) return store;
+        }
+
+        return new UnavailableKeyStore();
     }
 }

@@ -499,10 +499,12 @@ Agent tools controlled by `--allow-write` flag. No concept-level permissions (ye
 ### Secrets Management
 
 API keys stored in:
-- The OS credential store (Windows Credential Manager today; a plain-text
-  fallback in `~/.compendium/` on platforms without one yet), written by
-  `compendium init` or the Web UI's Settings page — either configures both
-  the CLI and the Web UI
+- The OS credential store — Windows Credential Manager, macOS Keychain, or
+  Linux Secret Service (`secret-tool`) — written by `compendium init` or
+  the Web UI's Settings page, either of which configures both the CLI and
+  the Web UI. Never written to disk in plaintext; if no keychain is
+  reachable, both surfaces fail with an error pointing at `LITELLM_API_KEY`
+  instead of silently degrading
 - `LITELLM_API_KEY` environment variable, as a CI/scripting fallback
 - Not in bundles (git-ignored), and never in a repo-tracked config file
 
