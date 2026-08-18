@@ -20,7 +20,7 @@ Example queries:
 List all systems
 What does the Order Management System do?
 Search for concepts about authentication
-Which integrations read from the ODS database?
+Which integrations read from the CoreDB database?
 Show me the data lineage for customer emails
 ```
 
@@ -38,23 +38,19 @@ In **write mode** (`--allow-write`), the agent can also:
 
 ## Agent Architecture
 
-```
-User Query
-    ↓
-System Agent (LLM)
-    ↓
-Tool Selection
-    ├─ ListConcepts
-    ├─ ReadConcept
-    ├─ SearchConcepts
-    ├─ CreateConcept (write mode)
-    ├─ UpdateConceptBody (write mode)
-    ├─ AddLink (write mode)
-    └─ FlagForReview (write mode)
-    ↓
-OKF Bundle (File System)
-    ↓
-Response with Citations
+```mermaid
+graph TD
+    Q[User Query] --> A["System Agent (LLM)"]
+    A --> T[Tool Selection]
+    T --> T1[ListConcepts]
+    T --> T2[ReadConcept]
+    T --> T3[SearchConcepts]
+    T --> T4["CreateConcept (write mode)"]
+    T --> T5["UpdateConceptBody (write mode)"]
+    T --> T6["AddLink (write mode)"]
+    T --> T7["FlagForReview (write mode)"]
+    T1 & T2 & T3 & T4 & T5 & T6 & T7 --> B["OKF Bundle (File System)"]
+    B --> R[Response with Citations]
 ```
 
 The agent:

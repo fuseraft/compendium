@@ -275,7 +275,7 @@ Compendium adds optional fields for specific use cases:
 
 #### Data Maps
 ```yaml
-source_systems: "ODS, Warehouse"
+source_systems: "CoreDB, Warehouse"
 destination_systems: "Reports, SFTP"
 destination_types: "File, Email"
 field_count: "23"

@@ -89,7 +89,7 @@ A business process or workflow.
 ### Data Map
 Field-level data lineage documentation.
 
-**Example:** "ProjectsToCalero", "CPRights"
+**Example:** "ProjectSync", "ContractsSync"
 
 ### Custom Types
 Define your own types based on your domain:
@@ -141,8 +141,8 @@ my-bundle/
 │   ├── orders-to-warehouse.md
 │   └── crm-to-marketing.md
 ├── data-maps/
-│   ├── projectstocalero.md
-│   └── cprights.md
+│   ├── projectsync.md
+│   └── contractssync.md
 └── references/
     ├── oms-wiki.html
     └── integration-catalog.csv

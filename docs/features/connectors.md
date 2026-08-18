@@ -11,13 +11,12 @@ Connectors are the bridge between where enterprise knowledge lives and the OKF b
 3. **Transform** content into OKF concepts
 4. **Preserve** original files in `references/` for provenance
 
-```
-Source System          Connector           OKF Bundle
-┌────────────┐        ┌─────────┐        ┌──────────────┐
-│ SharePoint │  ───▶  │ Extract │  ───▶  │ concepts/    │
-│ Confluence │        │ Transform│        │ references/  │
-│ File System│        │ Preserve │        └──────────────┘
-└────────────┘        └─────────┘
+```mermaid
+graph LR
+    SRC["Source System<br/>SharePoint<br/>Confluence<br/>File System"]
+    CONN["Connector<br/>Extract<br/>Transform<br/>Preserve"]
+    DST["OKF Bundle<br/>concepts/<br/>references/"]
+    SRC --> CONN --> DST
 ```
 
 ## Built-In Connectors

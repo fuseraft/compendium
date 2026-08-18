@@ -133,7 +133,7 @@ Input: `config.json`
 {
   "service": "Order Management",
   "version": "2.3",
-  "database": "ODS"
+  "database": "CoreDB"
 }
 ```
 
@@ -144,14 +144,14 @@ type: Document
 title: "config"
 service: "Order Management"
 version: "2.3"
-database: "ODS"
+database: "CoreDB"
 ---
 
 ```json
 {
   "service": "Order Management",
   "version": "2.3",
-  "database": "ODS"
+  "database": "CoreDB"
 }
 ```
 ```

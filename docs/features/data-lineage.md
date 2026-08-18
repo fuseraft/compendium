@@ -6,20 +6,17 @@ Compendium tracks field-level data lineage through data maps, enabling you to tr
 
 Data lineage documents the journey of data through an organization's systems:
 
-```
-Source System          Integration/ETL         Destination System
-┌──────────────┐      ┌────────────────┐      ┌──────────────┐
-│ ODS Database │      │ ProjectsToCalero│      │ CSV File     │
-│              │ ───▶ │                │ ───▶ │              │
-│ Project.ID   │      │ Transform:     │      │ ProjectId    │
-│ Project.Name │      │ - Rename       │      │ Name         │
-└──────────────┘      │ - Format       │      └──────────────┘
-                      └────────────────┘
+```mermaid
+graph LR
+    SRC["CoreDB<br/>Project.ID<br/>Project.Name"]
+    ETL["ProjectSync<br/>Transform:<br/>- Rename<br/>- Format"]
+    DST["CSV File<br/>ProjectId<br/>Name"]
+    SRC --> ETL --> DST
 ```
 
 Compendium captures this as structured OKF concepts, enabling queries like:
 
-- "Which integrations read from the ODS database?"
+- "Which integrations read from the CoreDB database?"
 - "What happens to customer email addresses?"
 - "Which reports use the SalesAmount field?"
 - "What's the impact if we change the Customer table schema?"
@@ -39,8 +36,8 @@ Data maps are ingested from Excel (`.xlsx`) or CSV (`.csv`) files with specific 
 
 | Int Name | Record Type | SRC DB | SRC Table | SRC Column | DST DB | DST Table | DST Column | Details |
 |----------|-------------|--------|-----------|------------|--------|-----------|------------|---------|
-| SalesReport | 2-Field Mapping | ODS | Sales | SalesAmount | ReportDB | DailySales | Amount | Rounded to 2 decimals |
-| SalesReport | 2-Field Mapping | ODS | Sales | OrderDate | ReportDB | DailySales | Date | Converted to UTC |
+| SalesReport | 2-Field Mapping | CoreDB | Sales | SalesAmount | ReportDB | DailySales | Amount | Rounded to 2 decimals |
+| SalesReport | 2-Field Mapping | CoreDB | Sales | OrderDate | ReportDB | DailySales | Date | Converted to UTC |
 
 ## Automatic Lineage Extraction
 
@@ -59,7 +56,7 @@ Each data map concept includes structured metadata:
 ```yaml
 type: Data Map
 title: "SalesReport"
-source_systems: "ODS"
+source_systems: "CoreDB"
 destination_systems: "ReportDB"
 destination_types: "Database"
 field_count: "23"
@@ -74,7 +71,7 @@ This enables precise filtering and graph queries.
 Ask natural language questions:
 
 ```
-Which integrations read from the ODS database?
+Which integrations read from the CoreDB database?
 Show me all data flows that write to files
 What transformations are applied to the SalesAmount field?
 Trace the lineage of customer email addresses
@@ -85,7 +82,7 @@ Which systems feed data into the reporting database?
 
 ```bash
 # Find integrations by source system
-compendium search --bundle my-catalog --query "source_systems:ODS"
+compendium search --bundle my-catalog --query "source_systems:CoreDB"
 
 # Find file outputs
 compendium list --bundle my-catalog --type "Data Map" --format json | \
@@ -102,7 +99,7 @@ compendium export --bundle my-catalog --type "Data Map" --format csv --output li
 curl http://localhost:5050/api/concepts?type=Data%20Map
 
 # Search by source system
-curl "http://localhost:5050/api/concepts/search?q=source_systems:ODS"
+curl "http://localhost:5050/api/concepts/search?q=source_systems:CoreDB"
 ```
 
 ## Lineage Visualization
@@ -122,17 +119,17 @@ Example:
 # SalesReport
 
 ## Overview
-Generates daily sales report from ODS database to ReportDB.
+Generates daily sales report from CoreDB database to ReportDB.
 
 ## Field Mappings
 
 | Source | Destination | Details |
 |--------|-------------|---------|
-| ODS.dbo.Sales.SalesAmount | ReportDB.dbo.DailySales.Amount | Rounded to 2 decimals |
-| ODS.dbo.Sales.OrderDate | ReportDB.dbo.DailySales.Date | Converted to UTC |
+| CoreDB.dbo.Sales.SalesAmount | ReportDB.dbo.DailySales.Amount | Rounded to 2 decimals |
+| CoreDB.dbo.Sales.OrderDate | ReportDB.dbo.DailySales.Date | Converted to UTC |
 
 ## Source Systems
-- ODS
+- CoreDB
 
 ## Destination Systems
 - ReportDB (Database)
@@ -148,10 +145,11 @@ compendium lineage graph --bundle my-catalog --output lineage.svg
 
 Will produce a directed graph:
 
-```
-ODS ──▶ ProjectsToCalero ──▶ CSV File
-ODS ──▶ SalesReport ──▶ ReportDB ──▶ PowerBI
-Warehouse ──▶ InventorySync ──▶ SFTP
+```mermaid
+graph LR
+    CoreDB --> ProjectSync --> CSV[CSV File]
+    CoreDB --> SalesReport --> ReportDB --> PowerBI
+    Warehouse --> InventorySync --> SFTP
 ```
 
 ## Use Cases
@@ -233,11 +231,12 @@ When Integration A's destination matches Integration B's source, Compendium will
 
 Example:
 
-```
-ODS ─▶ ProjectsToCalero ─▶ CSV ─▶ S3Upload ─▶ S3 Bucket ─▶ DataWarehouse ─▶ PowerBI
+```mermaid
+graph LR
+    CoreDB --> ProjectSync --> CSV --> S3Upload --> S3["S3 Bucket"] --> DataWarehouse --> PowerBI
 ```
 
-Query: "Trace ODS.Project.Name to PowerBI"
+Query: "Trace CoreDB.Project.Name to PowerBI"
 
 Result: Full chain showing every transformation along the way.
 
@@ -248,10 +247,10 @@ Result: Full chain showing every transformation along the way.
 Use the same names for systems across all data maps:
 
 ✅ **Good:**
-- Always use "ODS" (not "ODS DB", "ODS_PROD", "Operational Data Store")
+- Always use "CoreDB" (not "CoreDB DB", "CoreDB_PROD", "Operational Data Store")
 
 ❌ **Bad:**
-- "ODS" in one map, "ODS_Database" in another, "Operational Store" in a third
+- "CoreDB" in one map, "CoreDB_Database" in another, "Operational Store" in a third
 
 ### 2. Document Transformations
 
@@ -275,7 +274,7 @@ Use `Record Type: 1-High-Level Overview` rows:
 ```
 Int Name: SalesReport
 Record Type: 1-High-Level Overview
-Details: Generates daily sales report from ODS to ReportDB, runs at 2am, includes previous day's sales
+Details: Generates daily sales report from CoreDB to ReportDB, runs at 2am, includes previous day's sales
 ```
 
 This context is valuable when reviewing lineage.

@@ -76,7 +76,7 @@ Example queries:
 
 - "List all concepts"
 - "What systems are documented?"
-- "Show me integrations that read from the ODS database"
+- "Show me integrations that read from the CoreDB database"
 
 ## Common Workflows
 

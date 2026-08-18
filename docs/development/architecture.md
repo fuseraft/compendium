@@ -4,40 +4,37 @@ This document describes Compendium's system architecture, design decisions, and 
 
 ## System Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         User Interfaces                          │
-│  ┌───────────┐  ┌───────────┐  ┌────────────┐  ┌─────────────┐ │
-│  │    CLI    │  │  Web UI   │  │  REST API  │  │  Workflows  │ │
-│  └─────┬─────┘  └─────┬─────┘  └──────┬─────┘  └──────┬──────┘ │
-└────────┼──────────────┼───────────────┼───────────────┼─────────┘
-         │              │               │               │
-         └──────────────┴───────────────┴───────────────┘
-                           │
-┌──────────────────────────┴───────────────────────────────────────┐
-│                       Core Components                             │
-│  ┌────────────────┐  ┌─────────────┐  ┌─────────────────────┐   │
-│  │  Agent System  │  │  OKF Engine │  │  Search & Query     │   │
-│  │  - Tools       │  │  - Parser   │  │  - Full-text search │   │
-│  │  - LLM Client  │  │  - Writer   │  │  - Filtering        │   │
-│  │  - Sessions    │  │  - Validator│  │  - Relationships    │   │
-│  └────────────────┘  └─────────────┘  └─────────────────────┘   │
-│                                                                   │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │                   Ingestion Pipeline                        │  │
-│  │  Format Readers → Extractors → Concept Builder → OKF Writer│  │
-│  └────────────────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────┬───────────────────────┘
-                                            │
-┌───────────────────────────────────────────┴───────────────────────┐
-│                      Storage Layer                                 │
-│  ┌─────────────────────┐           ┌──────────────────────────┐   │
-│  │  OKF Bundle         │           │  Configuration           │   │
-│  │  - Concept files    │           │  - ~/.compendium/        │   │
-│  │  - References       │           │  - appsettings.json      │   │
-│  │  - Git repository   │           └──────────────────────────┘   │
-│  └─────────────────────┘                                          │
-└───────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph UI["User Interfaces"]
+        CLI[CLI]
+        WEB["Web UI"]
+        API["REST API"]
+        WF[Workflows]
+    end
+
+    subgraph Core["Core Components"]
+        AGENT["Agent System<br/>- Tools<br/>- LLM Client<br/>- Sessions"]
+        OKF["OKF Engine<br/>- Parser<br/>- Writer<br/>- Validator"]
+        SEARCH["Search & Query<br/>- Full-text search<br/>- Filtering<br/>- Relationships"]
+        INGEST["Ingestion Pipeline<br/>Format Readers → Extractors → Concept Builder → OKF Writer"]
+    end
+
+    subgraph Storage["Storage Layer"]
+        BUNDLE["OKF Bundle<br/>- Concept files<br/>- References<br/>- Git repository"]
+        CONFIG["Configuration<br/>- ~/.compendium/<br/>- appsettings.json"]
+    end
+
+    CLI --> Core
+    WEB --> Core
+    API --> Core
+    WF --> Core
+
+    AGENT --> BUNDLE
+    OKF --> BUNDLE
+    SEARCH --> BUNDLE
+    INGEST --> BUNDLE
+    AGENT --> CONFIG
 ```
 
 ## Project Structure

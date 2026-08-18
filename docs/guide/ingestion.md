@@ -133,14 +133,14 @@ my-bundle/
 │   ├── architecture.md
 │   └── design-spec.md
 ├── data-maps/              # --type "Data Map"
-│   ├── projectstocalero.md
-│   └── cprights.md
+│   ├── projectsync.md
+│   └── contractssync.md
 ├── architecture-diagrams/  # --type "Architecture Diagram"
 │   ├── system-overview.md
 │   └── network-topology.md
 └── references/             # Original files preserved
     ├── architecture.pdf
-    ├── projectstocalero.xlsx
+    ├── projectsync.xlsx
     └── system-overview.drawio
 ```
 

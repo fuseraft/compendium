@@ -70,17 +70,17 @@ Given this data map:
 
 | Int Name | Record Type | SRC DB | SRC Schema | SRC Table | SRC Column | DST DB | DST Schema | DST Table | DST Column | Details |
 |----------|-------------|--------|------------|-----------|------------|--------|------------|-----------|------------|---------|
-| ProjectsToCalero | 1-High-Level Overview | N/A | N/A | N/A | N/A | N/A | N/A | N/A | N/A | Takes project data from ODS, transforms to CSV |
-| ProjectsToCalero | 2-Field Mapping | ODS | dbo | Project | ProjectString | N/A | N/A | N/A | N/A | The CSV column is called "ProjectId" |
-| ProjectsToCalero | 2-Field Mapping | ODS | dbo | Project | Name | N/A | N/A | N/A | N/A | The CSV column is called "Name" |
+| ProjectSync | 1-High-Level Overview | N/A | N/A | N/A | N/A | N/A | N/A | N/A | N/A | Takes project data from CoreDB, transforms to CSV |
+| ProjectSync | 2-Field Mapping | CoreDB | dbo | Project | ProjectString | N/A | N/A | N/A | N/A | The CSV column is called "ProjectId" |
+| ProjectSync | 2-Field Mapping | CoreDB | dbo | Project | Name | N/A | N/A | N/A | N/A | The CSV column is called "Name" |
 
-Compendium creates **one concept** named "ProjectsToCalero" with:
+Compendium creates **one concept** named "ProjectSync" with:
 
 ```yaml
 ---
 type: Data Map
-title: "ProjectsToCalero"
-source_systems: "ODS"
+title: "ProjectSync"
+source_systems: "CoreDB"
 destination_systems: "File (CSV)"
 destination_types: "File"
 field_count: "2"
@@ -88,17 +88,17 @@ field_count: "2"
 
 # Overview
 
-Takes project data from ODS, transforms to CSV
+Takes project data from CoreDB, transforms to CSV
 
 **Field Mappings:**
 
 | Source | Destination | Details |
 |--------|-------------|---------|
-| ODS.dbo.Project.ProjectString | N/A | The CSV column is called "ProjectId" |
-| ODS.dbo.Project.Name | N/A | The CSV column is called "Name" |
+| CoreDB.dbo.Project.ProjectString | N/A | The CSV column is called "ProjectId" |
+| CoreDB.dbo.Project.Name | N/A | The CSV column is called "Name" |
 
 **Source Systems:**
-- ODS
+- CoreDB
 
 **Destination Systems:**
 - File (CSV)
@@ -123,7 +123,7 @@ Recognized destination types:
 
 With the Compendium system agent, you can ask questions like:
 
-- "Which integrations read from the ODS database?"
+- "Which integrations read from the CoreDB database?"
 - "Show me all data flows that output to files"
 - "What integrations transform data to uppercase?"
 - "Which systems feed data into the reporting database?"
