@@ -197,28 +197,27 @@ compendium chat --bundle my-catalog     # Read-only
 compendium chat --bundle my-catalog --allow-write  # With curation tools
 ```
 
-The model isn't a per-session flag — it comes from `LITELLM_MODEL`,
-configured once via `compendium init`.
+The model isn't a per-session flag — it's configured once via
+`compendium init` or the Web UI's Settings page.
 
-### Web UI Configuration
+### Web UI Default Bundle
 
-Edit `src/Compendium.Web/appsettings.json`:
+The bundle the Web UI loads at startup is set in
+`Compendium:BundlePath` in `src/Compendium.Web/appsettings.json`:
 
 ```json
 {
   "Compendium": {
-    "DefaultBundlePath": "catalog/sample",
-    "AllowAgentWrite": false,
-    "MaxTokens": 4000,
-    "Temperature": 0.7
+    "BundlePath": "catalog/sample"
   }
 }
 ```
 
 ### LLM Provider
 
-Configure via `compendium init` (writes `.env` at the repo root) or
-environment variables:
+Configure via `compendium init` or the Web UI's Settings page — either one
+configures both surfaces, with no config file to hand-edit. For CI or
+scripting, environment variables are also honored as a fallback:
 
 ```bash
 export LITELLM_BASE_URL="https://api.openai.com/v1"
@@ -308,7 +307,8 @@ Enable `--allow-write` only when actively curating. For queries, read-only mode 
 **Problem**: "Failed to connect to LLM provider"
 
 **Solutions**:
-- Check API key: `cat .env` (at the repo root)
+- Check configuration: re-run `compendium init`, or view current settings
+  on the Web UI's Settings page (the API key itself is never displayed)
 - Verify base URL is correct
 - Test connectivity: `curl -I https://api.openai.com/v1/models`
 - Check firewall/proxy settings

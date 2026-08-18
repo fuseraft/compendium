@@ -4,79 +4,53 @@
 
 Compendium works with any OpenAI-compatible API endpoint.
 
-### Interactive Configuration
+There is no config file to hand-edit. LLM settings are configured through
+one of two interactive entry points, and **either one configures both the
+CLI and the Web UI** — they share the same underlying store, so you only
+need to do this once:
+
+### Option 1: CLI
 
 ```bash
 compendium init
 ```
 
-### Manual Configuration
+Prompts for a provider base URL, API key, and model (offering a pick-list
+fetched from the provider's `/models` endpoint when available).
 
-`compendium init` writes a `.env` file at the repo root — you can edit it
-directly instead:
+### Option 2: Web UI
 
-```
-LITELLM_BASE_URL=https://api.openai.com/v1
-LITELLM_API_KEY=sk-...
-LITELLM_MODEL=gpt-4
-```
+Start the web server (`./bin/web/Compendium.Web`) and open the
+[Settings page](../guide/web-ui.md#6-settings-page) at `/settings`. Same
+fields, same shared result.
+
+### Where it's stored
+
+- Base URL and model name: `~/.compendium/llm-config.json`
+- API key: the OS-native credential store where available (Windows
+  Credential Manager today; see [issue tracker](https://github.com/fuseraft/compendium/issues)
+  for macOS Keychain / Linux Secret Service support), falling back to a
+  plain-text file in `~/.compendium/` on platforms without one yet
 
 ### Supported Providers
 
-#### OpenAI
+Any OpenAI-compatible endpoint works. Enter these values when prompted by
+`compendium init` or the Web UI Settings page:
 
-```
-LITELLM_BASE_URL=https://api.openai.com/v1
-LITELLM_API_KEY=sk-...
-LITELLM_MODEL=gpt-4-turbo-preview
-```
+| Provider | Base URL | Model example |
+|----------|----------|----------------|
+| OpenAI | `https://api.openai.com/v1` | `gpt-4-turbo-preview` |
+| Azure OpenAI | `https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT` | `gpt-4` |
+| litellm Proxy | `http://localhost:4000` | `gpt-4` |
+| Anthropic (via litellm) | `http://localhost:4000` | `claude-3-opus-20240229` |
+| Ollama (local) | `http://localhost:11434/v1` | `llama3.1` |
 
-#### Azure OpenAI
+## Environment Variables (CI / scripting)
 
-```
-LITELLM_BASE_URL=https://YOUR_RESOURCE.openai.azure.com/openai/deployments/YOUR_DEPLOYMENT
-LITELLM_API_KEY=...
-LITELLM_MODEL=gpt-4
-```
-
-#### litellm Proxy
-
-```
-LITELLM_BASE_URL=http://localhost:4000
-LITELLM_API_KEY=sk-1234
-LITELLM_MODEL=gpt-4
-```
-
-#### Anthropic (via litellm)
-
-```
-LITELLM_BASE_URL=http://localhost:4000
-LITELLM_API_KEY=sk-ant-...
-LITELLM_MODEL=claude-3-opus-20240229
-```
-
-## Web UI Configuration
-
-Edit `src/Compendium.Web/appsettings.json`:
-
-```json
-{
-  "Compendium": {
-    "DefaultBundlePath": "catalog/sample"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  }
-}
-```
-
-## Environment Variables
-
-`LITELLM_BASE_URL`, `LITELLM_API_KEY`, and `LITELLM_MODEL` can be set
-directly in the environment instead of (or to override) `.env`:
+For non-interactive contexts — CI pipelines, containers, scripted runs —
+the CLI also accepts `LITELLM_BASE_URL`, `LITELLM_API_KEY`, and
+`LITELLM_MODEL` as a fallback when nothing has been configured via
+`compendium init` or the Web UI:
 
 ```bash
 export LITELLM_API_KEY="sk-..."
@@ -85,6 +59,25 @@ export LITELLM_MODEL="gpt-4"
 
 compendium chat --bundle my-catalog
 ```
+
+This only applies to the CLI. The Web UI always reads from the shared
+store described above.
+
+## Web UI Default Bundle
+
+The Web UI loads a bundle at startup from `Compendium:BundlePath` in
+`src/Compendium.Web/appsettings.json`:
+
+```json
+{
+  "Compendium": {
+    "BundlePath": "catalog/sample"
+  }
+}
+```
+
+This is a build-time default, not something the CLI's `compendium init`
+sets — point it at your catalog before publishing the web server.
 
 ## Bundle Configuration
 

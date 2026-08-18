@@ -15,7 +15,9 @@ This interactive command will prompt you for:
 - API key
 - Model name
 
-The configuration is saved to a `.env` file at the repo root.
+The configuration is saved to `~/.compendium/llm-config.json` plus your
+OS credential store — the same store the Web UI's Settings page uses, so
+whichever one you configure through, the other picks it up too.
 
 ## 2. Create a Bundle
 

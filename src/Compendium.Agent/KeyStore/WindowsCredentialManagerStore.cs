@@ -1,11 +1,11 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Compendium.Web.KeyStore;
+namespace Compendium.Agent.KeyStore;
 
 internal sealed class WindowsCredentialManagerStore : IApiKeyStore
 {
-    private const string TargetName = "compendium-web/llm-api-key";
+    private const string TargetName = "compendium/llm-api-key";
     private const int CredTypeGeneric = 1;
     private const int CredPersistLocalMachine = 2;
 

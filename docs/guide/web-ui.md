@@ -20,13 +20,13 @@ The server starts on http://localhost:5050 by default.
 
 ### Configuration
 
-Edit `src/Compendium.Web/appsettings.json`:
+The default bundle and listen URL are set in
+`src/Compendium.Web/appsettings.json`:
 
 ```json
 {
   "Compendium": {
-    "DefaultBundlePath": "catalog/sample",
-    "AllowAgentWrite": false
+    "BundlePath": "catalog/sample"
   },
   "Urls": "http://localhost:5050",
   "Logging": {
@@ -36,6 +36,10 @@ Edit `src/Compendium.Web/appsettings.json`:
   }
 }
 ```
+
+LLM provider settings are **not** configured here — see
+[Settings Page](#6-settings-page) below, or
+[Configuration](../getting-started/configuration.md).
 
 ## Features
 
@@ -120,14 +124,15 @@ Supported formats: See [Ingestion Guide](ingestion.md)
 
 **URL**: http://localhost:5050/settings
 
-Configure the web UI:
+Configure the LLM provider — base URL, API key, and model, with a
+"Fetch Available Models" lookup against the provider's `/models` endpoint.
 
-- **Bundle path** — Change active bundle
-- **LLM configuration** — API endpoint, key, model
-- **Agent permissions** — Enable/disable write mode
-- **UI preferences** — Theme, page size, filters
-
-Changes persist to `appsettings.json` (requires restart).
+This is the same configuration `compendium init` writes on the CLI side —
+whichever one you use, the other picks it up automatically. Settings save
+immediately (no restart) to `~/.compendium/llm-config.json` plus the OS
+credential store for the API key. See
+[Configuration](../getting-started/configuration.md#llm-provider-configuration)
+for where things are stored.
 
 ## API Endpoints
 
@@ -379,7 +384,7 @@ export ASPNETCORE_URLS="http://localhost:8080"
 ```json
 {
   "Compendium": {
-    "DefaultBundlePath": "/full/path/to/my-catalog"
+    "BundlePath": "/full/path/to/my-catalog"
   }
 }
 ```

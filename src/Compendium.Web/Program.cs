@@ -15,9 +15,10 @@ builder.Services.AddSingleton<LlmConfigService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     var service = new LlmConfigService();
-    // Load from persistent storage first (async in background)
-    _ = service.LoadAsync();
-    // Fallback to appsettings.json
+    // Load from persistent storage first — this is the store shared with
+    // `compendium init` and the CLI, so either one configures both surfaces.
+    service.LoadAsync().GetAwaiter().GetResult();
+    // Fallback to appsettings.json if nothing was persisted yet.
     service.LoadFromConfiguration(config);
     return service;
 });

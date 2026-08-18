@@ -499,9 +499,12 @@ Agent tools controlled by `--allow-write` flag. No concept-level permissions (ye
 ### Secrets Management
 
 API keys stored in:
-- `.env` at the repo root (written by `compendium init`)
-- Environment variables
-- Not in bundles (git-ignored)
+- The OS credential store (Windows Credential Manager today; a plain-text
+  fallback in `~/.compendium/` on platforms without one yet), written by
+  `compendium init` or the Web UI's Settings page — either configures both
+  the CLI and the Web UI
+- `LITELLM_API_KEY` environment variable, as a CI/scripting fallback
+- Not in bundles (git-ignored), and never in a repo-tracked config file
 
 ## Future Architecture
 

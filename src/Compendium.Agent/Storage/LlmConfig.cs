@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Compendium.Web.Storage;
+namespace Compendium.Agent.Storage;
 
 public class LlmConfig
 {

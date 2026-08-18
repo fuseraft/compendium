@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Compendium.Web.KeyStore;
-using Compendium.Web.Storage;
+using Compendium.Agent.KeyStore;
+using Compendium.Agent.Storage;
 
 namespace Compendium.Web.Services;
 

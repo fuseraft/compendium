@@ -1,4 +1,4 @@
-namespace Compendium.Web.KeyStore;
+namespace Compendium.Agent.KeyStore;
 
 /// <summary>
 /// Fallback keystore that stores API keys in plain text in the user config directory.

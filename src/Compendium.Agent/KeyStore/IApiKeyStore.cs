@@ -1,4 +1,4 @@
-namespace Compendium.Web.KeyStore;
+namespace Compendium.Agent.KeyStore;
 
 public interface IApiKeyStore
 {

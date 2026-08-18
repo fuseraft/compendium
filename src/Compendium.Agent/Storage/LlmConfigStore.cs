@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Compendium.Web.Storage;
+namespace Compendium.Agent.Storage;
 
 public static class LlmConfigStore
 {

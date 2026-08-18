@@ -228,7 +228,11 @@ Then open http://localhost:5050 in your browser. The web UI provides:
 - **Chat interface** for asking questions
 - **REST API** at `/api/concepts` for programmatic access
 
-Configure the bundle path and LLM settings in `src/Compendium.Web/appsettings.json`.
+The default bundle path is set in `Compendium:BundlePath` in
+`src/Compendium.Web/appsettings.json`. LLM settings are configured through
+the Settings page (`/settings`) or `compendium init` on the CLI — either
+one configures both surfaces, so there's no config file to hand-edit for
+that part. See [Configuration](docs/getting-started/configuration.md).
 
 ### CLI
 

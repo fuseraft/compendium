@@ -14,12 +14,8 @@ public static class ChatCommand
             Env.Load(envPath);
         }
 
-        AgentSettings settings;
-        try
-        {
-            settings = AgentSettings.FromEnvironment();
-        }
-        catch (InvalidOperationException)
+        var settings = AgentSettings.TryLoad();
+        if (settings is null)
         {
             Console.WriteLine("Not configured yet — run `dotnet run --project src/Compendium.Cli -- init` first.");
             return 1;

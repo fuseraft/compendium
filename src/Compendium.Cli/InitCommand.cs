@@ -1,36 +1,38 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using DotNetEnv;
+using Compendium.Agent.KeyStore;
+using Compendium.Agent.Storage;
 
 namespace Compendium.Cli;
 
 // Interactive setup: prompts for the provider base URL, API key, and
 // model (offering a pick-list fetched from the provider's /models
-// endpoint when available), then writes .env.
+// endpoint when available), then persists to the store shared with the
+// Web UI's Settings page (~/.compendium/llm-config.json + the OS
+// credential store). Either surface — `compendium init` or the Web UI —
+// configures both; there's no config file for the user to hand-edit.
 public static class InitCommand
 {
     public static async Task<int> RunAsync()
     {
-        var envPath = RepoLocator.EnvPath();
-        if (File.Exists(envPath))
-        {
-            Env.Load(envPath);
-        }
+        var keyStore = ApiKeyStoreFactory.Create();
+        var existing = LlmConfigStore.Load();
+        var existingApiKey = existing is not null ? await keyStore.RetrieveAsync() : null;
 
         Console.WriteLine("Compendium setup — configure your model provider.");
         Console.WriteLine();
 
-        var baseUrl = PromptBaseUrl(Environment.GetEnvironmentVariable("LITELLM_BASE_URL"));
-        var apiKey = PromptApiKey(Environment.GetEnvironmentVariable("LITELLM_API_KEY"));
-        var model = await PromptModelAsync(baseUrl, apiKey, Environment.GetEnvironmentVariable("LITELLM_MODEL"));
+        var baseUrl = PromptBaseUrl(existing?.BaseUrl);
+        var apiKey = PromptApiKey(existingApiKey);
+        var model = await PromptModelAsync(baseUrl, apiKey, existing?.ModelName);
 
-        await File.WriteAllTextAsync(
-            envPath,
-            $"LITELLM_BASE_URL={baseUrl}\nLITELLM_API_KEY={apiKey}\nLITELLM_MODEL={model}\n");
+        LlmConfigStore.Save(new LlmConfig { BaseUrl = baseUrl, ModelName = model });
+        await keyStore.StoreAsync(apiKey);
 
         Console.WriteLine();
-        Console.WriteLine($"Saved to {envPath}");
+        Console.WriteLine($"Saved to {LlmConfigStore.ConfigPath} (API key in {keyStore.StoreName}).");
+        Console.WriteLine("This also configures the Web UI — no separate setup needed there.");
         Console.WriteLine("Run `dotnet run --project src/Compendium.Cli -- chat` to start.");
         return 0;
     }

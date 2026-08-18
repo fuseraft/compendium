@@ -37,9 +37,12 @@ Prompts for:
 There's no separate overwrite flag — re-running `init` shows your current
 values as defaults, so it doubles as "reconfigure."
 
-Configuration is saved to a `.env` file at the repo root
-(`LITELLM_BASE_URL`, `LITELLM_API_KEY`, `LITELLM_MODEL`), not a JSON config
-file.
+Configuration is saved to the same store the Web UI's Settings page
+(`/settings`) reads and writes: `~/.compendium/llm-config.json` for the
+base URL and model, and the OS credential store (or a plain-text fallback
+where none is available) for the API key. Whichever one you configure
+through — `init` or the Web UI — the other picks it up automatically;
+there's no config file for you to edit directly.
 
 #### Example
 
@@ -55,7 +58,8 @@ Available models:
   3. gpt-3.5-turbo
 Model (number or id): 1
 
-Saved to /home/you/compendium/.env
+Saved to /home/you/.compendium/llm-config.json (API key in Windows Credential Manager).
+This also configures the Web UI — no separate setup needed there.
 Run `dotnet run --project src/Compendium.Cli -- chat` to start.
 ```
 
@@ -170,7 +174,8 @@ compendium chat --bundle <path> [options]
 ```
 
 There's no `--model`, `--temperature`, or `--max-tokens` flag — the model
-comes from `LITELLM_MODEL` in `.env` (set via `compendium init`).
+comes from the config saved by `compendium init` (or the `LITELLM_MODEL`
+environment variable, see [Configuration](#configuration) below).
 
 #### Examples
 
@@ -217,26 +222,20 @@ Source: systems/billing-service.md (stable)
 
 ## Configuration
 
-### Config File Location
+### Config Location
 
-`.env` at the repo root (found by walking up from the running executable
-to `Compendium.slnx`). There's no `--config` flag or `COMPENDIUM_CONFIG`
-variable to override the path.
+There's no config file to edit and no `--config` flag or
+`COMPENDIUM_CONFIG` variable. `compendium init` (or the Web UI's Settings
+page) persists to `~/.compendium/llm-config.json` plus the OS credential
+store for the API key — see
+[Configuration](../getting-started/configuration.md#llm-provider-configuration)
+for the full breakdown.
 
-### Config File Format
+### Environment Variables (CI / scripting)
 
-Plain `KEY=value` lines, written by `compendium init`:
-
-```
-LITELLM_BASE_URL=https://api.openai.com/v1
-LITELLM_API_KEY=sk-...
-LITELLM_MODEL=gpt-4-turbo-preview
-```
-
-### Environment Variables
-
-The same three variables can be set directly in the environment instead of
-(or to override) `.env`:
+For non-interactive use, `LITELLM_BASE_URL`, `LITELLM_API_KEY`, and
+`LITELLM_MODEL` are honored as a fallback when nothing has been configured
+via `init` or the Web UI:
 
 ```bash
 export LITELLM_BASE_URL="https://api.openai.com/v1"
@@ -244,9 +243,9 @@ export LITELLM_API_KEY="sk-..."
 export LITELLM_MODEL="gpt-4"
 ```
 
-`LITELLM_MODEL` falls back to `anthropic.claude-sonnet-5` if unset;
-`LITELLM_BASE_URL` and `LITELLM_API_KEY` are required — `chat` exits with
-an error telling you to run `init` if either is missing.
+`LITELLM_MODEL` falls back to `anthropic.claude-sonnet-5` if unset. `chat`
+exits with an error telling you to run `init` if neither the persisted
+config nor `LITELLM_BASE_URL`/`LITELLM_API_KEY` are set.
 
 ## Exit Codes
 

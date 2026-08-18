@@ -346,8 +346,8 @@ Different models offer different trade-offs:
 - Good for: Large-scale curation, complex lineage tracing
 
 The model isn't a per-session flag — configure it once via `compendium init`
-(writes `LITELLM_MODEL` to `.env`), or set the `LITELLM_MODEL` environment
-variable directly.
+or the Web UI's Settings page (either one applies to both surfaces), or set
+the `LITELLM_MODEL` environment variable for CI/scripting use.
 
 ## Limitations
 
